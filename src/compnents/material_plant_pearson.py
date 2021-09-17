@@ -4,6 +4,9 @@ from correlation_analysis.pearson import *
 from db.data_storage import insert_table_pearson
 from factor_analysis.factor_analysis import *
 from db.dataQuery import *
+from data_preprocess.standardizing import *
+from data_preprocess.outlierProcessing import *
+from plot.pairPlot import *
 
 #
 # True_P=0.5
@@ -44,10 +47,30 @@ from db.dataQuery import *
 def oneMaterialOnAllPlantPearson(material):
     #从数据库读取数据 并进行预处理：数据清洗、数据转换、缺失值处理、数据合并
     df = data_extraction.get_df_from_db(material)
-    # print(df)
+    print(df.dtypes)
+
+    df.boxplot()
+    plt.savefig("boxplot_" + material +".jpg")
+    plt.show()
+    # 离群值处理
+    outlierProcessing(df)
+
+    # df.boxplot()
+    # plt.savefig("boxplot_after_" + material + ".jpg")
+    # plt.show()
 
     #对数据进行序列编码、独热编码
     df = encoding(df)
+
+
+    # 对数据进行标准化
+    print(df.dtypes)
+    df = pearsonDytypeExg(df)
+    minMaxScaler(df)
+
+    # 单变量散点图
+    # pairplot(df, material)
+
 
     # print(df)
     # print(df.dtypes)
@@ -57,9 +80,11 @@ def oneMaterialOnAllPlantPearson(material):
     # print(df['plant'].unique())
 
     #计算所有油站单个商品pearson系数
-    df_pearson = pearson_all_plant(df, material)
+    # df_pearson = pearson_all_plant(df, material)
+    df_pearson = df.corr()
 
     return  df_pearson
+    #return df
 
 
 

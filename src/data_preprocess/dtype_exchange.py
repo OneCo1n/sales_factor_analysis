@@ -11,7 +11,7 @@ def date_conversion_toStr(df):
 
 def pearsonDytypeExg(df):
 
-    df['material'] = df['material'].astype('str')
+    #df['material'] = df['material'].astype('str')
     df['plant'] = df['plant'].astype('str')
 
     for col in df.columns[2:]:

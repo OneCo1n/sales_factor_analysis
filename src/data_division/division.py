@@ -1,5 +1,6 @@
 import pandas as pd
 
+# 将单个油站的销售信息分离处理来
 def divisionByPlant(df, plant_name):
 
     plant_class = df['plant'].unique()
