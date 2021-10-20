@@ -47,13 +47,14 @@ from plot.pairPlot import *
 def oneMaterialOnAllPlantPearson(material):
     #从数据库读取数据 并进行预处理：数据清洗、数据转换、缺失值处理、数据合并
     df = data_extraction.get_df_from_db(material)
-    print(df.dtypes)
+    # print(df.dtypes)
 
-    df.boxplot()
-    plt.savefig("boxplot_" + material +".jpg")
-    plt.show()
+    # df.boxplot()
+    # plt.savefig("boxplot_" + material +".jpg")
+    # plt.show()
     # 离群值处理
     outlierProcessing(df)
+
 
     # df.boxplot()
     # plt.savefig("boxplot_after_" + material + ".jpg")
@@ -64,9 +65,20 @@ def oneMaterialOnAllPlantPearson(material):
 
 
     # 对数据进行标准化
-    print(df.dtypes)
+    # print(df.dtypes)
     df = pearsonDytypeExg(df)
     minMaxScaler(df)
+
+    # 销量分析所需要的数据
+    # dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant','date','plant_type_desc'], inplace=False)
+
+    # 进站人数影响因素分析需要的数据
+    dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant', 'quantity' ,'date', 'plant_type_desc'], inplace=False)
+
+
+
+    # outputpath = 'F:\论文\data\\test\\bill_' + material + '.csv'
+    # dfDsv.to_csv(outputpath, index=False, header=True)
 
     # 单变量散点图
     # pairplot(df, material)
@@ -83,7 +95,7 @@ def oneMaterialOnAllPlantPearson(material):
     # df_pearson = pearson_all_plant(df, material)
     df_pearson = df.corr()
 
-    return  df_pearson
+    return  df_pearson,dfDsv
     #return df
 
 

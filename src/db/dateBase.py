@@ -23,14 +23,16 @@ def exe_sql(sql):
 
     data_df = cursor.fetchall()
     # 获取连接对象的描述信息
-    columnDes = cursor.description
-    columnNames = [columnDes[i][0] for i in range(len(columnDes))]
-    df = pd.DataFrame([list(i) for i in data_df], columns=columnNames)
+    # columnDes = cursor.description
+    # columnNames = [columnDes[i][0] for i in range(len(columnDes))]
+    # df = pd.DataFrame([list(i) for i in data_df], columns=columnNames)
 
     cursor.close()
-    closeDBConnect(db)
+    # closeDBConnect(db)
 
-    return df
+    #return df
+
+
 
 # 带值的
 # def exe_sql(sql, valus):

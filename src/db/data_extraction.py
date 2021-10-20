@@ -2,8 +2,8 @@ import pymysql
 import pandas as pd
 import time
 import numpy as np
-
-from data_preprocess.dtype_exchange import date_conversion_toStr
+from operator import itemgetter
+from data_preprocess.dtype_exchange import *
 from data_preprocess.del_str import del_str_m2
 
 from data_preprocess.missing_value_processing import *
@@ -19,7 +19,8 @@ def get_df_from_db(material):
     print("start ")
 
     #material = "0000000000" + material
-    sql_select_bill_by_material = "select  plant, date, quantity from table_bill_groupby_plant_calday where material = '" + material + "'"
+    # sql_select_bill_by_material = "select  plant, date, quantity from table_bill_groupby_plant_calday where material = '" + material + "'"
+    sql_select_bill_by_material = "select  plant, date, quantity from table_bill_groupby_plant_calmonth where material = '" + material + "' order by date"
 
     sql_select_discount_by_material = "SELECT  a.plant, a.calday, a.discount_rate " \
                                       "from table_discount_rate a " \
@@ -49,6 +50,9 @@ def get_df_from_db(material):
                                         "b.plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc " \
                                         "from table_number_station_store  a left join table_pos_zaplant_xy_orc_508  b " \
                                         "on a.plant = b.bic_zaplant where a.date BETWEEN '2016-01-01' and '2021-06-01' order by a.date"
+
+    sql_select_plant_poi = "select * from table_plant_poi"
+
 
     #cursor.execute("select * from table_70251989_sales_plant")
     time_sql_start = time.time()
@@ -116,6 +120,22 @@ def get_df_from_db(material):
     print("已获取油站信息 耗时：%.3fs" % (time_sql_end - time_sql_start))
 
     #print("execute time: %.3f" % ((time_sql_end - time_sql_start) ) )
+
+
+    time_sql_start = time.time()
+    print("正在获取油站周围3000m之内的poi信息......")
+    cursor.execute(sql_select_plant_poi)
+    # 使用 fetchall() 方法获取所有数据.以元组形式返回
+    data_plant_poi = cursor.fetchall()
+    columnDes = cursor.description
+    columnNames = [columnDes[i][0] for i in range(len(columnDes))]
+    df_plant_poi = pd.DataFrame([list(i) for i in data_plant_poi],
+                                                   columns=columnNames)
+    time_sql_end = time.time()
+    # outputpath='F:\论文\data\\df_data_plant_join_numofpeople_code.csv'
+    # df_data_plant_join_numofpeople_code.to_csv(outputpath,index=False,header=True)
+    print("已获取poi信息 耗时：%.3fs" % (time_sql_end - time_sql_start))
+
 
     #print(data)
 # 关闭数据库连接
@@ -224,6 +244,8 @@ def get_df_from_db(material):
     df_data_plant_join_numofpeople_code['paking_area'] = df_data_plant_join_numofpeople_code['paking_area'].astype('float64')
     df_data_plant_join_numofpeople_code['store_area'] = df_data_plant_join_numofpeople_code['store_area'].astype('float64')
 
+    df_plant_poi = data_conversion_toInt(df_plant_poi)
+
 
 
     time_data_conversion_end = time.time()
@@ -274,7 +296,10 @@ def get_df_from_db(material):
     # df_data_plant_join_numofpeople['plant'] = df_data_plant_join_numofpeople['plant'].astype('str')
     # df_data_plant_join_numofpeople['date'] = df_data_plant_join_numofpeople['date'].astype('str')
     #数据合并
-    df_data_material_discount_plant = pd.merge(df_material_sales, df_data_plant_join_numofpeople_code, left_on=['plant' ,'date'], right_on = ['plant', 'date'], how = 'left')
+    df_data_plant_join_numofpeople_join_poi = pd.merge(df_data_plant_join_numofpeople_code, df_plant_poi, left_on=['plant'], right_on = ['plant'], how = 'left')
+    df_data_material_discount_plant = pd.merge(df_material_sales, df_data_plant_join_numofpeople_join_poi, left_on=['plant' ,'date'], right_on = ['plant', 'date'], how = 'left')
+    # 按日期排序
+    df_data_material_discount_plant = sorted(df_data_material_discount_plant, key= itemgetter('date'))
     #df = pd.merge(df_data_material_discount_plant, df_data_material_promotion, left_on=['plant', 'date'], right_on=['plant', 'date'], how='left')
     time_data_merge_end = time.time()
 
@@ -311,9 +336,29 @@ def get_df_from_db(material):
     missing_value_fill_num_0(df_data_material_discount_plant, 'promotion_amount')
     missing_value_fill_num_0(df_data_material_discount_plant, 'retail_price')
     missing_value_fill_num_1(df_data_material_discount_plant, 'discount_rate2')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type05')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type06')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type07')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type10')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type12')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type14')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type17')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type11')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type08')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type03')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type20')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type16')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type01')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type19')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type15')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type97')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type02')
+    missing_value_fill_num_0(df_data_material_discount_plant, 'type13')
 
 
-    #缺失值处理之后的情况
+
+
+#缺失值处理之后的情况
     print('-----------------缺失值处理之后------------------')
     # missing_value_check(df_data_material_bill)
     # missing_value_check(df_data_material_discount)
