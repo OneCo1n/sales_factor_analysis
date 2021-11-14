@@ -1,136 +1,228 @@
+# coding=utf-8 ##以utf-8编码储存中文字符
+from sklearn.model_selection import GridSearchCV   #Perforing grid search
 import pandas as pd
+from sklearn.metrics import mean_squared_error
 import numpy as np
+from scipy.stats import mode
+import warnings
+from sklearn.model_selection import train_test_split
+import xgboost as xgb
+from xgboost.sklearn import XGBClassifier
+import operator
 import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set()
+import matplotlib
+# 根据历史的每天销量预测未来的销量，之前稍微统计，每个月的总量基本是不变的。
+#
+# 效果其实和求均值差不多
+warnings.filterwarnings('ignore')
+
+def mode_function(df):
+    df = df.astype(int)
+    counts = mode(df)
+    return counts[0][0]
+
+def score(y_test,y_pred):
+    print(y_test)
+    print(y_pred)
+    return 1.0 / (1.0 + np.sqrt(mean_squared_error(y_test, y_pred)))
+
+train = pd.read_csv('input/train.csv')
+print('训练集总数',train.shape)
+print('字段',train.columns)
+sub = pd.read_csv('input/result.csv')
+sub['SaleM'] = sub['日期'].map(lambda x:int(str(x)[5:6]))
+sub['SaleD'] = sub['日期'].map(lambda x:int(str(x)[6:]))
+#sub['销售日期_D'] = sub['日期'].map(lambda x:str(x)[-2:])
+sub['SaleD'] = sub['SaleD'] .astype(int)
+sub['SaleM'] = sub['SaleM'] .astype(int)
+result = sub.copy()
+#print(sub)
+sub_train = sub[['编码', 'SaleM', 'SaleD', '销量', '日期']]
+#print("sub_train:")
+#print(sub_train)
+
+train['SaleM'] = train['销售日期'].map(lambda x:int(str(x)[5:6]))
+train['SaleD'] = train['销售日期'].map(lambda x:int(str(x)[6:]))
+train['SaleD'] = train['SaleD'] .astype(int)
+train['SaleM'] = train['SaleM'] .astype(int)
+train.drop(['大类名称', '中类名称', '小类名称', '销售月份', '商品编码', '小类编码', '单位', '销售日期', '规格型号', 'custid', '商品类型', '商品单价', '销售金额', '销售数量', '是否促销'],axis=1,inplace=True)
 
 
-#训练集和测试集
-train = pd.read_csv('../data/sales_train.csv')
-test= pd.read_csv('../data/test.csv')
-train.head()
 
-test.head()
+def cal_w(row):
+    if row.SaleM == 1:
+        return (row.SaleD + 3) % 7
+    elif row.SaleM == 2:
+        return (row.SaleD + 6) % 7
+    elif row.SaleM == 3:
+        return (row.SaleD + 6) % 7
+    elif row.SaleM == 4:
+        return (row.SaleD + 2) % 7
+    elif row.SaleM == 5:
+        return (row.SaleD + 4) % 7
 
-print('训练集的商店数量： %d ，商品数量： %d；\n' % (train['shop_id'].unique().size, train['item_id'].unique().size),
-     '测试的商店数量： %d，商品数量： %d。' % (test['shop_id'].unique().size, test['item_id'].unique().size))
 
-test[~test['shop_id'].isin(train['shop_id'].unique())]
+train['SaleW'] = train.apply(cal_w, axis=1)
+train['SaleW'] = train['SaleW'].astype(int)
 
-test[~test['item_id'].isin(train['item_id'].unique())]['item_id'].unique()[:10]
+def cal_wn(row):
+    if row.SaleM == 1:
+        return (row.SaleD + 2) / 7 + 1
+    elif row.SaleM == 2:
+        return (row.SaleD + 5) / 7 + 5
+    elif row.SaleM == 3:
+        return (row.SaleD + 5) / 7 + 9
+    elif row.SaleM == 4:
+        return (row.SaleD + 1) / 7 + 14
+    elif row.SaleM == 5:
+        return (row.SaleD + 3) / 7 + 18
 
-np.array([5320, 5268, 5826, 3538, 3571, 3604, 3407, 3408, 3405, 3984], dtype=np.int64)
 
-#商店数据集
-shops = pd.read_csv('../data/shops.csv')
-shops.head()
+train['SaleWn'] = train.apply(cal_wn, axis=1)
+train['SaleWn'] = train['SaleWn'].astype(int)
 
-# 查看测试集是否包含了这几个商店
-test[test['shop_id'].isin([39, 40, 10, 11, 0, 57, 58, 1, 12 ,56])]['shop_id'].unique()
+sub_train['SaleW'] = sub_train.apply(cal_w, axis=1)
+sub_train['SaleW'] = sub_train['SaleW'].astype(int)
 
-np.array([10, 12, 57, 58, 56, 39], dtype=np.int64)
+sub_train['SaleWn'] = sub_train.apply(cal_wn, axis=1)
+sub_train['SaleWn'] = sub_train['SaleWn'].astype(int)
+#sub_train['SaleWn'] = sub_train.apply(cal_wn, axis=1)
+#sub_train['SaleWn'] = sub_train['SaleWn'].astype(int)
+#sub_train.drop(['SaleM', 'SaleD'], axis=1, inplace=True)
+sub_train.drop(['日期'],axis=1,inplace=True)
+train['is_buy'] = 1
+train['is_buy'] = train['is_buy'].astype(int)
+train_count = train.groupby(['中类编码', 'SaleW', 'SaleWn', 'SaleD', 'SaleM'],as_index=False)['is_buy'].sum()
+train_count2 = train.groupby(['大类编码', 'SaleW', 'SaleWn', 'SaleD', 'SaleM'],as_index=False)['is_buy'].sum()
 
-shop_id_map = {11: 10, 0: 57, 1: 58, 40: 39}
-train.loc[train['shop_id'].isin(shop_id_map), 'shop_id'] = train.loc[train['shop_id'].isin(shop_id_map), 'shop_id'].map(shop_id_map)
-train.loc[train['shop_id'].isin(shop_id_map), 'shop_id']
 
-#Series([], Name: shop_id, dtype: int64)
-pd.Series(['Name', 'dtype'],index= ['shop_id', 'int64'])
-train.loc[train['shop_id'].isin([39, 40, 10, 11, 0, 57, 58, 1]), 'shop_id'].unique()
-np.array([57, 58, 10, 39], dtype=np.int64)
+train_count.rename(columns = {'is_buy':'销量'},inplace=True)
+train_count.rename(columns = {'中类编码':'编码'},inplace=True)
+train_count['label'] = 1
+train_count2.rename(columns = {'is_buy':'销量'},inplace=True)
+train_count2.rename(columns = {'大类编码':'编码'},inplace=True)
+train_count2['label'] = 0
+train_count= pd.concat([train_count,train_count2])
+train_count=train_count[train_count['SaleWn'] != 8]
+indexs = train_count[(train_count.SaleM==2)&(train_count.SaleD==4)].index.tolist()
+train_count = train_count.drop(indexs)
 
-shops['shop_city'] = shops['shop_name'].map(lambda x:x.split(' ')[0].strip('!'))
-shop_types = ['ТЦ', 'ТРК', 'ТРЦ', 'ТК', 'МТРЦ']
-shops['shop_type'] = shops['shop_name'].map(lambda x:x.split(' ')[1] if x.split(' ')[1] in shop_types else 'Others')
-shops.loc[shops['shop_id'].isin([12, 56]), ['shop_city', 'shop_type']] = 'Online'  # 12和56号是网上商店
-shops.head(13)
 
-# 对商店信息进行编码，降低模型训练的内存消耗
-shop_city_map = dict([(v,k) for k, v in enumerate(shops['shop_city'].unique())])
-shop_type_map = dict([(v,k) for k, v in enumerate(shops['shop_type'].unique())])
-shops['shop_city_code'] = shops['shop_city'].map(shop_city_map)
-shops['shop_type_code'] = shops['shop_type'].map(shop_type_map)
-shops.head(7)
+def cal_label(row):
+    if row.编码 < 1000:
+        return 0
+    else:
+        return 1
 
-items = pd.read_csv('../data/items.csv')
-items
 
-# 数据集比较大，只分析有没有重复名称不同ID的商品
-items['item_name'] = items['item_name'].map(lambda x: ''.join(x.split(' ')))  # 删除空格
-duplicated_item_name = items[items['item_name'].duplicated()]
-duplicated_item_name
+sub_train['label'] = sub_train.apply(cal_label, axis=1)
 
-duplicated_item_name_rec = items[items['item_name'].isin(duplicated_item_name['item_name'])]  # 6个商品相同名字不同id的记录
-duplicated_item_name_rec
+#print(train_count)
+#print(sub_train)
+#print(sub_train)
+#print(train_count)
 
-test[test['item_id'].isin(duplicated_item_name_rec['item_id'])]['item_id'].unique()
+day_dummies_train  = pd.get_dummies(train_count['SaleW'], prefix='Day')
+day_dummies_test  = pd.get_dummies(sub_train['SaleW'], prefix='Day')
+train_count = train_count.join(day_dummies_train)
+sub_train = sub_train.join(day_dummies_test)
 
-np.array([19581, 5063], dtype=np.int64)
+#train_count.drop(['SaleW', 'SaleD', 'SaleM'], axis=1,inplace=True)
+#sub_train.drop(['SaleW', 'SaleD', 'SaleM'], axis=1,inplace=True)
+#print(train_count)
+print(sub_train)
 
-old_id = duplicated_item_name_rec['item_id'].values[::2]
-new_id = duplicated_item_name_rec['item_id'].values[1::2]
-old_new_map = dict(zip(old_id, new_id))
-old_new_map
+def rmspe(y, yhat):
+    return np.sqrt(np.mean((yhat/y-1) ** 2))
 
-{2514: 2558, 2968: 2970, 5061: 5063, 14537: 14539, 19465: 19475, 19579: 19581}
-train.loc[train['item_id'].isin(old_id), 'item_id'] = train.loc[train['item_id'].isin(old_id), 'item_id'].map(old_new_map)
-train[train['item_id'].isin(old_id)]
+def rmspe_xg(yhat, y):
+    y = np.expm1(y.get_label())
+    yhat = np.expm1(yhat)
+    return "rmspe", rmspe(y,yhat)
 
-train[train['item_id'].isin(duplicated_item_name_rec['item_id'].values)]['item_id'].unique()  # 旧id成功替换成新id
-np.array([ 2558, 14539, 19475, 19581,  5063,  2970], dtype=np.int64)
+def build_features(features):
+#     features.extend(['编码', 'SaleWn','Day_0','Day_1','Day_2','Day_3','Day_4','Day_5','Day_6']) #0.43926 0.42849
+#     features.extend(['编码', 'SaleWn', 'SaleW']) #0.336992 0.361086 0.351852
+#     features.extend(['编码', 'SaleW','SaleD','SaleWn'])
+     features.extend(['编码', 'SaleWn','Day_0','Day_1','Day_2','Day_3','Day_4','Day_5','Day_6','SaleW','SaleD','label'])
 
-items.groupby('item_id').size()[items.groupby('item_id').size() > 1]  # 检查同一个商品是否分了不同类目
 
-#Series([], dtype: int64)
-pd.Series(['dtype'], index= ['int64'])
-cat = pd.read_csv('../data/item_categories.csv')
-cat
+params = {"objective": "reg:linear",
+          "booster" : "gbtree",
+          "max_depth": 9,
+          "subsample": 1.0,
+          "eta": 0.3,
+          "eval_metric": "rmse",
+          "silent": 0,
 
-cat[cat['item_category_name'].duplicated()]
-cat['item_type'] = cat['item_category_name'].map(lambda x: 'Игры' if x.find('Игры ')>0 else x.split(' -')[0].strip('\"'))
-cat.iloc[[32, 33, 34, -3, -2, -1]]  # 有几个比较特殊，需要另外调整一下
-cat.iloc[[32,-3, -2], -1] = ['Карты оплаты', 'Чистые носители', 'Чистые носители' ]
-cat.iloc[[32,-3, -2]]
-item_type_map = dict([(v,k) for k, v in enumerate(cat['item_type'].unique())])
-cat['item_type_code'] = cat['item_type'].map(item_type_map)
-cat.head()
-cat['sub_type'] = cat['item_category_name'].map(lambda x: x.split('-',1)[-1])
-cat
-cat['sub_type'].unique()
-np.array([' Гарнитуры/Наушники', ' PS2', ' PS3', ' PS4', ' PSP', ' PSVita',
-       ' XBOX 360', ' XBOX ONE', 'Билеты (Цифра)', 'Доставка товара',
-       ' Прочие', ' Аксессуары для игр', ' Цифра',
-       ' Дополнительные издания', ' Коллекционные издания',
-       ' Стандартные издания', 'Карты оплаты (Кино, Музыка, Игры)',
-       ' Live!', ' Live! (Цифра)', ' PSN', ' Windows (Цифра)', ' Blu-Ray',
-       ' Blu-Ray 3D', ' Blu-Ray 4K', ' DVD', ' Коллекционное',
-       ' Артбуки, энциклопедии', ' Аудиокниги', ' Аудиокниги (Цифра)',
-       ' Аудиокниги 1С', ' Бизнес литература', ' Комиксы, манга',
-       ' Компьютерная литература', ' Методические материалы 1С',
-       ' Открытки', ' Познавательная литература', ' Путеводители',
-       ' Художественная литература', ' CD локального производства',
-       ' CD фирменного производства', ' MP3', ' Винил',
-       ' Музыкальное видео', ' Подарочные издания', ' Атрибутика',
-       ' Гаджеты, роботы, спорт', ' Мягкие игрушки', ' Настольные игры',
-       ' Настольные игры (компактные)', ' Открытки, наклейки',
-       ' Развитие', ' Сертификаты, услуги', ' Сувениры',
-       ' Сувениры (в навеску)', ' Сумки, Альбомы, Коврики д/мыши',
-       ' Фигурки', ' 1С:Предприятие 8', ' MAC (Цифра)',
-       ' Для дома и офиса', ' Для дома и офиса (Цифра)', ' Обучающие',
-       ' Обучающие (Цифра)', 'Служебные', ' Билеты',
-       'Чистые носители (шпиль)', 'Чистые носители (штучные)',
-       'Элементы питания'], dtype=object)
+          }
+features = []
+build_features(features)
+num_boost_round = 100000
+print("Train a XGBoost model")
 
-sub_type_map = dict([(v,k) for k, v in enumerate(cat['sub_type'].unique())])
-cat['sub_type_code'] = cat['sub_type'].map(sub_type_map)
-cat.head()
+#X_train = train_count[train_count['SaleWn'] < 14]      0.1523 并不如随机划分
+#X_valid = train_count[train_count['SaleWn'] > 14]
+X_train, X_valid = train_test_split(train_count, test_size=0.2)
+y_train = X_train.销量
+y_valid = X_valid.销量
+dtrain = xgb.DMatrix(X_train[features], y_train)
+dvalid = xgb.DMatrix(X_valid[features], y_valid)
+watchlist = [(dtrain, 'train'), (dvalid, 'eval')]
 
-items = items.merge(cat[['item_category_id', 'item_type_code', 'sub_type_code']], on='item_category_id', how='left')
-items.head()
+#gsearch1 = GridSearchCV(estimator = XGBClassifier(         learning_rate =0.1,
+#min_child_weight=1,  subsample=1,
+# objective= 'reg:linear'),
+# param_grid = param_test1,     scoring='roc_auc',iid=False)
+#gsearch1.fit(dtrain,dvalid)
+#print(gsearch1)
+gbm = xgb.train(params, dtrain, num_boost_round, evals=watchlist, \
+  early_stopping_rounds=100, verbose_eval=True)
 
-import gc
-del cat
-gc.collect()
+print("Make predictions on the test set")
+dtest = xgb.DMatrix(sub_train[features])
+test_probs = gbm.predict(dtest)
+# Make Submission
+sub_ = pd.DataFrame({u'销量':list(test_probs)})
+sub_['销量'] = sub_['销量']
+sub_['销量'] = sub_['销量'].astype(int)
 
-#必须写x= y= data=
-sns.jointplot(x='item_cnt_day', y='item_price', data=train, kind='scatter')
+#print(sub_)
+result = result[['编码','日期']]
+# 单独看了看中类 去掉大于10000 就是全部需要预测的
+result_sub_ = pd.concat([result[['编码','日期']],sub_['销量']],axis=1)
+
+def cal_r(row):
+    if row.销量 < 0:
+        return 0
+    else:
+        return row.销量
+
+result_sub_['销量'] = result_sub_.apply(cal_r, axis=1)
+result_sub_.to_csv('./sample_1.csv', index=False)
+
+
+#这里要先写xgb.map然后把编码改一下再读画图
+#def create_feature_map(features):
+#    outfile = open('xgb.fmap', 'w')
+#    for i, feat in enumerate(features):
+#        outfile.write('{0}\t{1}\tq\n'.format(i, feat))
+#    outfile.close()
+#create_feature_map(features)
+
+'''
+importance = gbm.get_fscore(fmap='xgb.fmap')
+importance = sorted(importance.items(), key=operator.itemgetter(1))
+
+df = pd.DataFrame(importance, columns=['feature', 'fscore'])
+df['fscore'] = df['fscore'] / df['fscore'].sum()
+
+featp = df.plot(kind='barh', x='feature', y='fscore', legend=False, figsize=(6, 10))
+plt.title('XGBoost Feature Importance')
+plt.xlabel('relative importance')
+fig_featp = featp.get_figure()
+fig_featp.savefig('feature_importance_xgb.png', bbox_inches='tight', pad_inches=1)
+
+
+
+'''

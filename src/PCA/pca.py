@@ -63,3 +63,6 @@ plt.xlabel(u'特征', fontproperties=font_set) # 横坐标
 plt.legend(loc='best')  # 图例位置，右下角
 plt.show()
 
+
+
+

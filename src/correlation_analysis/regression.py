@@ -10,12 +10,12 @@ def multipleLinearRegression(adv_data):
     # 清洗不需要的数据
     new_adv_data = adv_data.iloc[:, 0:]
     # 得到我们所需要的数据集且查看其前几列以及数据形状
-    print('head:', new_adv_data.head(), '\nShape:', new_adv_data.shape)
+    #print('head:', new_adv_data.head(), '\nShape:', new_adv_data.shape)
 
     # 数据描述
-    print(new_adv_data.describe())
+    #print(new_adv_data.describe())
     # 缺失值检验
-    print(new_adv_data[new_adv_data.isnull() == True].count())
+    #print(new_adv_data[new_adv_data.isnull() == True].count())
 
     # new_adv_data.boxplot()
     # plt.savefig("boxplot.jpg")
@@ -23,7 +23,7 @@ def multipleLinearRegression(adv_data):
     ##相关系数矩阵 r(相关系数) = x和y的协方差/(x的标准差*y的标准差) == cov（x,y）/σx*σy
     # 相关系数0~0.3弱相关0.3~0.6中等程度相关0.6~1强相关
     pearson = new_adv_data.corr()
-    print(pearson)
+    #print(pearson)
 
     # 建立散点图来查看数据集里的数据分布
     # seaborn的pairplot函数绘制X的每一维度和对应Y的散点图。通过设置size和aspect参数来调节显示的大小和比例。
@@ -43,11 +43,11 @@ def multipleLinearRegression(adv_data):
     # 利用sklearn里面的包来对数据集进行划分，以此来创建训练集和测试集
     # train_size表示训练集所占总数据集的比例
     # 销量影响因素
-    # X_train, X_test, Y_train, Y_test = train_test_split(new_adv_data.iloc[:, 1:34], new_adv_data.quantity,
-    #                                                     test_size=0.25,train_size=0.75)
-    #进站人数影响因素
     X_train, X_test, Y_train, Y_test = train_test_split(new_adv_data.iloc[:, 1:34], new_adv_data.quantity,
-                                                        test_size=0.25, train_size=0.75)
+                                                        test_size=0.25,train_size=0.75)
+    #进站人数影响因素
+    # X_train, X_test, Y_train, Y_test = train_test_split(new_adv_data.iloc[:, 1:34], new_adv_data.quantity,
+    #                                                    test_size=0.25, train_size=0.75)
 
     # print("原始数据特征:", new_adv_data.iloc[:, 1:16].shape,
     #       ",训练数据特征:", X_train.shape,
@@ -65,7 +65,8 @@ def multipleLinearRegression(adv_data):
 
     b = model.coef_  # 回归系数
 
-    print("最佳拟合线:截距", a, ",回归系数：", b)
+
+    #print("最佳拟合线:截距", a, ",回归系数：", b)
     # y=2.668+0.0448∗TV+0.187∗Radio-0.00242∗Newspaper
 
     # R方检测
@@ -79,19 +80,19 @@ def multipleLinearRegression(adv_data):
     # 2）值大小：R平方越高，回归模型越精确(取值范围0~1)，1无误差，0无法完成拟合
     score = model.score(X_test, Y_test)
 
-    print("R:", score)
+    #print("R:", score)
 
     # 对线性回归进行预测
 
     Y_pred = model.predict(X_test)
 
-    # print(Y_pred)
-    #
-    # plt.plot(range(len(Y_pred)), Y_pred, 'b', label="predict")
-    # # 显示图像
-    # # plt.savefig("predict.jpg")
-    # plt.show()
-    #
+    #print(Y_pred)
+
+    #plt.plot(range(len(Y_pred)), Y_pred, 'b', label="predict")
+    # 显示图像
+    # plt.savefig("predict.jpg")
+    #plt.show()
+
     # plt.figure()
     # plt.plot(range(len(Y_pred)), Y_pred, 'b', label="predict")
     # plt.plot(range(len(Y_pred)), Y_test, 'r', label="test")

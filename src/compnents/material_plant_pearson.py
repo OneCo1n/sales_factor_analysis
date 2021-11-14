@@ -1,12 +1,15 @@
+from data_preprocess.missing_value_processing import missing_value_fill_num_0
 from db import data_extraction
 from data_encoding.encoder import *
 from correlation_analysis.pearson import *
+from db.data_extraction import getPlantJoinNumofpeopleCode
 from db.data_storage import insert_table_pearson
 from factor_analysis.factor_analysis import *
 from db.dataQuery import *
 from data_preprocess.standardizing import *
 from data_preprocess.outlierProcessing import *
 from plot.pairPlot import *
+from db.data_storage import *
 
 #
 # True_P=0.5
@@ -42,6 +45,91 @@ from plot.pairPlot import *
 # plt.show() ## 画图
 
 
+def peopleOfPlantPearson(plant):
+    # 从数据库读取数据 并进行预处理：数据清洗、数据转换、缺失值处理、数据合并
+    df = data_extraction.getNumberOfPlantAndPoiInfo(plant)
+    # print(df.dtypes)
+    # 离群值处理
+    print(df)
+    outlierProcessingPeoplePlant(df)
+    # 对数据进行序列编码、独热编码
+    df = encodingPlantPOIInfo(df)
+    # 对数据进行标准化
+    print(df.dtypes)
+    df = pearsonDytypeExgPlantPOI(df)
+    minMaxScalerPlantPOIInfo(df)
+    missing_value_fill_num_0(df, 'type05')
+    missing_value_fill_num_0(df, 'type06')
+    missing_value_fill_num_0(df, 'type07')
+    missing_value_fill_num_0(df, 'type10')
+    missing_value_fill_num_0(df, 'type12')
+    missing_value_fill_num_0(df, 'type14')
+    missing_value_fill_num_0(df, 'type17')
+    missing_value_fill_num_0(df, 'type11')
+    missing_value_fill_num_0(df, 'type08')
+    missing_value_fill_num_0(df, 'type03')
+    missing_value_fill_num_0(df, 'type20')
+    missing_value_fill_num_0(df, 'type16')
+    missing_value_fill_num_0(df, 'type01')
+    missing_value_fill_num_0(df, 'type19')
+    missing_value_fill_num_0(df, 'type15')
+    missing_value_fill_num_0(df, 'type97')
+    missing_value_fill_num_0(df, 'type02')
+    missing_value_fill_num_0(df, 'type13')
+    print("标准化---------------")
+    print(df)
+
+    # 进站人数分析所需要的数据
+    dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant', 'date'], inplace=False)
+
+    df_pearson = df.corr()
+    print(df_pearson)
+
+    return df_pearson, dfDsv
+
+
+
+def allPeopleOfPlantPearson():
+    # 从数据库读取数据 并进行预处理：数据清洗、数据转换、缺失值处理、数据合并
+    df = data_extraction.getAllNumberOfPlantAndPoiInfo()
+    # print(df.dtypes)
+    # 离群值处理
+    # print(df)
+    outlierProcessingPeoplePlant(df)
+    # 对数据进行序列编码、独热编码
+    df = encodingPlantPOIInfo(df)
+    # 对数据进行标准化
+    # print(df.dtypes)
+    df = pearsonDytypeExgPlantPOI(df)
+    minMaxScalerPlantPOIInfo(df)
+    missing_value_fill_num_0(df, 'type05')
+    missing_value_fill_num_0(df, 'type06')
+    missing_value_fill_num_0(df, 'type07')
+    missing_value_fill_num_0(df, 'type10')
+    missing_value_fill_num_0(df, 'type12')
+    missing_value_fill_num_0(df, 'type14')
+    missing_value_fill_num_0(df, 'type17')
+    missing_value_fill_num_0(df, 'type11')
+    missing_value_fill_num_0(df, 'type08')
+    missing_value_fill_num_0(df, 'type03')
+    missing_value_fill_num_0(df, 'type20')
+    missing_value_fill_num_0(df, 'type16')
+    missing_value_fill_num_0(df, 'type01')
+    missing_value_fill_num_0(df, 'type19')
+    missing_value_fill_num_0(df, 'type15')
+    missing_value_fill_num_0(df, 'type97')
+    missing_value_fill_num_0(df, 'type02')
+    missing_value_fill_num_0(df, 'type13')
+    # print("标准化---------------")
+    # print(df)
+
+    # 进站人数分析所需要的数据
+    dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant', 'date'], inplace=False)
+
+    df_pearson = df.corr()
+    # print(df_pearson)
+
+    return df_pearson, dfDsv
 
 
 def oneMaterialOnAllPlantPearson(material):
@@ -63,17 +151,16 @@ def oneMaterialOnAllPlantPearson(material):
     #对数据进行序列编码、独热编码
     df = encoding(df)
 
-
     # 对数据进行标准化
     # print(df.dtypes)
     df = pearsonDytypeExg(df)
     minMaxScaler(df)
 
     # 销量分析所需要的数据
-    # dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant','date','plant_type_desc'], inplace=False)
+    dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant','date','plant_type_desc'], inplace=False)
 
     # 进站人数影响因素分析需要的数据
-    dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant', 'quantity' ,'date', 'plant_type_desc'], inplace=False)
+    # dfDsv = df.drop(labels=None, axis=1, index=None, columns=['plant', 'quantity' ,'date', 'plant_type_desc'], inplace=False)
 
 
 
@@ -129,7 +216,22 @@ def allMaterialOnAllPlantPearson():
     print("商品相关性分析结束 耗时：%.3fs" % (time.time() - time_start))
     return  df_pearson
 
-
+def oneMaterialTotalInfo(material, plantInfo):
+    #从数据库读取数据 并进行预处理：数据清洗、数据转换、缺失值处理、数据合并
+    df = data_extraction.get_df_from_db(material, plantInfo)
+    # print(df.dtypes)
+    # df.boxplot()
+    # plt.savefig("boxplot_" + material +".jpg")
+    # plt.show()
+    # 离群值处理
+    outlierProcessing(df)
+    # df.boxplot()
+    # plt.savefig("boxplot_after_" + material + ".jpg")
+    # plt.show()
+    #对数据进行序列编码、独热编码
+    df = encoding(df)
+    # 数据插入总表中
+    insert_table_total(material,df)
 
 
 
@@ -166,8 +268,8 @@ def allMaterialOnAllPlantPearson():
 # correlation_analysis.correlation_analysis(df)
 
 
-
-
+#peopleOfPlantPearson("AJ16")
+# allPeopleOfPlantPearson()
 
 
 

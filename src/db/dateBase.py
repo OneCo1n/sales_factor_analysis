@@ -10,7 +10,6 @@ def getDBConnect():
     db = "cnpc_local_k40"
     charset = "utf8"
     db = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, charset=charset)
-
     return db
 
 
@@ -52,6 +51,7 @@ def exe_sql(sql):
 #     return df
 
 
-def closeDBConnect(db):
+def closeDBConnect(cursor,db):
 
+    cursor.close
     db.close

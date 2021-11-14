@@ -37,34 +37,34 @@ def LabelEncoder_asset(df):
 
 def LabelEncoder_roadClass(df):
     col = "road_class"
-    df.loc[df[col] == '0001', col] = 1;
-    df.loc[df[col] == '0002', col] = 2;
-    df.loc[df[col] == '0003', col] = 3;
-    df.loc[df[col] == '0004', col] = 4;
+    df.loc[df[col] == '0001', col] = 4;
+    df.loc[df[col] == '0002', col] = 3;
+    df.loc[df[col] == '0003', col] = 2;
+    df.loc[df[col] == '0004', col] = 1;
     df[col] = df[col].astype('int')
 
 def LabelEncoder_plantClass(df):
     col = "plant_class_code"
-    df.loc[df[col] == '0001', col] = 1;
-    df.loc[df[col] == '0002', col] = 2;
-    df.loc[df[col] == '0003', col] = 3;
-    df.loc[df[col] == '0004', col] = 4;
+    df.loc[df[col] == '0001', col] = 4;
+    df.loc[df[col] == '0002', col] = 3;
+    df.loc[df[col] == '0003', col] = 2;
+    df.loc[df[col] == '0004', col] = 1;
     df[col] = df[col].astype('int')
 
 def LabelEncoder_locationClass(df):
     col = "plant_location_class"
-    df.loc[df[col] == '001', col] = 1;
-    df.loc[df[col] == '002', col] = 2;
-    df.loc[df[col] == '003', col] = 3;
-    df.loc[df[col] == '004', col] = 4;
-    df.loc[df[col] == '005', col] = 5;
-    df.loc[df[col] == '006', col] = 6;
-    df.loc[df[col] == '007', col] = 7;
-    df.loc[df[col] == '008', col] = 8;
-    df.loc[df[col] == '009', col] = 9;
-    df.loc[df[col] == '010', col] = 10;
-    df.loc[df[col] == '011', col] = 11;
-    df.loc[df[col] == '012', col] = 12;
+    df.loc[df[col] == '001', col] = 12;
+    df.loc[df[col] == '002', col] = 11;
+    df.loc[df[col] == '003', col] = 10;
+    df.loc[df[col] == '004', col] = 9;
+    df.loc[df[col] == '005', col] = 8;
+    df.loc[df[col] == '006', col] = 7;
+    df.loc[df[col] == '007', col] = 6;
+    df.loc[df[col] == '008', col] = 5;
+    df.loc[df[col] == '009', col] = 4;
+    df.loc[df[col] == '010', col] = 3;
+    df.loc[df[col] == '011', col] = 2;
+    df.loc[df[col] == '012', col] = 1;
     df[col] = df[col].astype('int')
 
 
@@ -85,6 +85,16 @@ def LabelEncoder_promotionType(df):
     df.loc[df[col] == 'BB08', col] = 13;
     df.loc[df[col] == 'BB09', col] = 14;
     df.loc[df[col] == 'BB10', col] = 15;
+    df.loc[df[col] == 'BB11', col] = 16;
+    df.loc[df[col] == 'BB14', col] = 17;
+    df.loc[df[col] == 'P', col] = 18;
+    df.loc[df[col] == 'BB31', col] = 19;
+    df.loc[df[col] == 'BB20', col] = 20;
+    df.loc[df[col] == 'BB24', col] = 24;
+
+
+
+
     df[col] = df[col].astype('int')
 
 def LabelEncoder_plantType(df):

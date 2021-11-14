@@ -34,3 +34,34 @@ def encoding(df):
     print("特征编码结束 耗时：%.3fs" % (time.time() - time_start))
 
     return df
+
+def encodingPlantPOIInfo(df):
+
+    time_start = time.time()
+    print("[info : encoding] 特征编码开始")
+    #需要热编码的特征
+    col_set_onehot = ['plant_asset', 'road_class', 'plant_class_code', 'plant_location_class', 'plant_type_desc']
+    # df = one_hot_encoding(df, col_set_onehot)
+    LabelEncoder_asset(df)
+    LabelEncoder_roadClass(df)
+    LabelEncoder_plantClass(df)
+    LabelEncoder_locationClass(df)
+    # LabelEncoder_plantType(df)
+
+    store = 'store_class'
+    plant = 'plant_stars'
+    keyanliang = 'plant_keyanliang_desc'
+
+    LabelEncoder_stars(df, store)
+    LabelEncoder_stars(df, plant)
+    LabelEncoder_keyanliang(df, keyanliang)
+
+    #字段筛选  'plant_asset', 'road_class', 'plant_class_code', 'plant_location_class', 'plant_type_desc','promotion_type'
+    # 类型转换
+    # df_data_plant_join_numofpeople_code['number_station'] = df_data_plant_join_numofpeople_code['number_station'].astype('int')
+    for col in df.columns[2:]:
+        df[col] = df[col].astype('int')
+
+    print("[info : encoding] 特征编码结束 耗时：%.3fs" % (time.time() - time_start))
+
+    return df
