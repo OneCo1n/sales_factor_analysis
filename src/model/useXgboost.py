@@ -5,7 +5,7 @@ from matplotlib import pyplot
 from xgboost import XGBClassifier
 from xgboost import plot_importance
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.feature_selection import SelectFromModel
 from data_preprocess.columnsExg import *
 from compnents.material_plant_pearson import oneMaterialOnAllPlantPearson
@@ -36,8 +36,10 @@ def trainMaterialXgboost(material):
     # fit model on all training data
     model = XGBClassifier()
     model.fit(X_train, Y_train)
-    model.score()
+    model.score(X_test,Y_test)
     print(model.feature_importances_)
+    print('The rmse of prediction is:', mean_squared_error(X_test, Y_test) ** 0.5)  # 计算真实值和预测值之间的均方根误差
+
     # plot
     name = getMaterialName(material)
     pyplot.bar(range(len(model.feature_importances_)), model.feature_importances_)
@@ -83,3 +85,5 @@ def trainMaterialXgboost(material):
 # 	predictions = [round(value) for value in y_pred]
 # 	accuracy = accuracy_score(y_test, predictions)
 # 	print("Thresh=%.3f, n=%d, Accuracy: %.2f%%" % (thresh, select_X_train.shape[1], accuracy*100.0))
+
+trainMaterialXgboost('000000000070251989')

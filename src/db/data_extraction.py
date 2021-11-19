@@ -48,11 +48,11 @@ def get_df_from_db(material ):
 
     sql_select_discount_by_material = "SELECT  a.plant, a.calday, a.discount_rate " \
                                       "from table_discount_rate a " \
-                                      "WHERE a.material = '" + material + "' and a.calday between '2016-01-01' and '2021-06-01'" \
+                                      "WHERE a.material = '" + material + "' and a.calday between '2019-01-01' and '2019-09-01'" \
                                                                         "order by a.calday"
     sql_select_promotion_by_material = "select plant, promotion_type, discount, promotion_quantity, promotion_amount, retail_price, calday " \
                                        "from table_promotion " \
-                                       "WHERE material = '" + material + "' and calday BETWEEN '2016-01-01' and '2021-06-01'"
+                                       "WHERE material = '" + material + "' and calday BETWEEN '2019-01-01' and '2019-09-01'"
 
 
     sql_select_plant_join_numofpeople = "SELECT a.plant , a.date, a.number_station, a.number_store, " \
@@ -73,7 +73,7 @@ def get_df_from_db(material ):
                                         "b.store_area,b.plant_class_code," \
                                         "b.plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc " \
                                         "from table_number_station_store  a left join table_pos_zaplant_xy_orc_508  b " \
-                                        "on a.plant = b.bic_zaplant where a.date BETWEEN '2016-01-01' and '2021-06-01' order by a.date"
+                                        "on a.plant = b.bic_zaplant where a.date BETWEEN '2019-01-01' and '2019-09-01' order by a.date"
 
     # getPlantJoinNumofpeopleCode 所取代
     # sql_select_plant_join_numofpeople_code = "SELECT plant , date, number_station, number_store, plant_asset, road_class, plant_stars,store_class," \

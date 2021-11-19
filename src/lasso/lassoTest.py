@@ -51,10 +51,8 @@ print(reg_coef)
 lasso_pred=lasso.predict(x_test)
 #均方误差
 MSE=mean_squared_error(y_test,lasso_pred)
-rms = sqrt(MSE)
-print(MSE)
-print('-----')
-print(rms)
-print(r2_score(y_test, lasso_pred))
+rmse = sqrt(MSE)
+print("rmse" , rmse)
+print("r2" ,r2_score(y_test, lasso_pred))
 
 
