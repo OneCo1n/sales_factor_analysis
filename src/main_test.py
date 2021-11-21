@@ -61,6 +61,7 @@ def anlalysisTry(materials):
     for material in materials:
 
         try:
+
             #material = input('input the material id: ')
 
             print("分析商品：" + material)
