@@ -11,11 +11,10 @@ from sklearn.metrics import r2_score#R square
 
 # Import helper functions
 
-
 from compnents.material_plant_pearson import oneMaterialOnAllPlantPearson
 from db import data_extraction
 
-material = '000000000070309748'
+material = '000000000070251989'
 #data = data_extraction.get_df_from_db(material)
 pearson, data = oneMaterialOnAllPlantPearson(material)
 print(data)
@@ -27,7 +26,7 @@ data = data.iloc[:, 0:]
 #拆分为训练集和测试集
 
 x_train,x_test,y_train,y_test=model_selection.train_test_split(data.iloc[:, 1:34], data.quantity,
-                                                        test_size=0.25,train_size=0.75)
+                                                        test_size=0.20,train_size=0.80)
 
 # x_train,x_test,y_train,y_test=model_selection.train_test_split(data[predictors],data.Y,
 #                                                                test_size=0.2,random_state=1234)

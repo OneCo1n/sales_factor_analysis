@@ -93,7 +93,7 @@ from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.linear_model import Lasso, LassoCV
 from sklearn.metrics import mean_squared_error
 
-x_tr, x_te, y_tr, y_te = train_test_split(data_x, data_y, train_size=0.7, random_state=22)
+x_tr, x_te, y_tr, y_te = train_test_split(data_x, data_y, train_size=0.8, random_state=22)
 ######################ridge########################################
 # 通过不同的alpha值 生成不同的ridge模型
 alphas = 10 ** np.linspace(-10, 10, 100)

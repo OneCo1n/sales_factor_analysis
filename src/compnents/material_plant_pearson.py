@@ -152,7 +152,7 @@ def oneMaterialOnAllPlantPearson(material):
     df = encoding(df)
 
     # 对数据进行标准化
-    # print(df.dtypes)
+    print(df.dtypes)
     df = pearsonDytypeExg(df)
     minMaxScaler(df)
 

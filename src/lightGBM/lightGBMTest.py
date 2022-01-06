@@ -2,19 +2,10 @@
 # pylint: disable = invalid-name, C0111
 
 import matplotlib.pylab as plt
-from sklearn.metrics import mean_squared_error #均方误差
-from sklearn.metrics import mean_absolute_error #平方绝对误差
 from sklearn.metrics import r2_score#R square
-import json
 import lightgbm as lgb
-import pandas as pd
-from sklearn import model_selection
 from sklearn.metrics import mean_squared_error
-from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import make_classification
-
-from compnents.material_plant_pearson import oneMaterialOnAllPlantPearson
 
 #iris = load_iris()  # 载入鸢尾花数据集
 #data = iris.data
@@ -22,33 +13,38 @@ from compnents.material_plant_pearson import oneMaterialOnAllPlantPearson
 # X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.2)
 #000000000070251989
 #000000000070309748
+from flaskTest.views.data_views.total_views import get_total_by_material
+from lasso.lassoNewTest import features_select_use_lasso
+
 material = '000000000070251989'
 #data = data_extraction.get_df_from_db(material)
-pearson, data = oneMaterialOnAllPlantPearson(material)
+# pearson, data = oneMaterialOnAllPlantPearson(material)
+data = get_total_by_material('000000000070251989')
+
 print(data)
+print(data.dtypes)
 #data=pd.read_excel(r'C:\Users\Administrator\Desktop\diabetes.xlsx')
 #predictors=data.columns[:-1]
 predictors = data['quantity']
 data = data.iloc[:, 0:]
+
 target = data.quantity
 #data=data.drop(['AGE','SEX'],axis=1)
 #拆分为训练集和测试集
 
-features = data.iloc[:, 1:34]
+rejected_features = features_select_use_lasso(data)
+
+rejected_features.append('plant')
+rejected_features.append('date')
+rejected_features.append('quantity')
+
+features = data.drop(labels=None, axis=1, index=None, columns=rejected_features, inplace=False)
+#features = data.iloc[:, 1:34]
+print("--------------features---------------------------")
+print(features)
 
 X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2)
-# x_train,x_test,y_train,y_test=model_selection.train_test_split(data.iloc[:, 1:34], data.quantity,
-#                                                         test_size=0.25,train_size=0.75)
 
-# 加载你的数据
-# print('Load data...')
-# df_train = pd.read_csv('../regression/regression.train', header=None, sep='\t')
-# df_test = pd.read_csv('../regression/regression.test', header=None, sep='\t')
-#
-# y_train = df_train[0].values
-# y_test = df_test[0].values
-# X_train = df_train.drop(0, axis=1).values
-# X_test = df_test.drop(0, axis=1).values
 
 # 创建成lgb特征的数据集格式
 lgb_train = lgb.Dataset(X_train, y_train)  # 将数据保存到LightGBM二进制文件将使加载更快

@@ -315,7 +315,7 @@ def get_df_from_db(material ):
     #df_material_sales = pd.merge(df_data_material_bill, df_data_material_discount, left_on = ['plant','date'], right_on = ['plant', 'date'], how = 'left' )
     df_material_sales = pd.merge(df_data_material_bill, df_data_material_promotion, left_on = ['plant','date'], right_on = ['plant', 'date'], how = 'left' )
 
-    #print(df_data_material_bill)
+    print(df_material_sales)
     #print(df_data_material_discount)
     #df_material_sales = pd.merge(df_data_material_bill, df_data_material_discount,on = ['material' ,'plant' ,'date'] ,how = 'left' )
     #print(df_material_sales.dtypes)
@@ -345,7 +345,7 @@ def get_df_from_db(material ):
 
 
 
-######################################################################################################################
+###############################################################################################s#######################
 #                                               缺失值处理
 #
 ######################################################################################################################
@@ -401,70 +401,6 @@ def get_df_from_db(material ):
 
     #缺失值检测
     #missing_value_check(df_data_material_discount_plant)
-
-
-
-
-
-#
-# ##################################################################################################################################
-# #                                  数据类型转换 - 2
-# #                          数据类型转换，之后好进行编码
-# ###################################################################################################################################
-#
-#     print("数据预处理：数据转换 - 2 start......")
-#     time_data_conversion_start = time.time()
-#
-#     #df_data_material_promotion.rename(columns = {'calday':'date'}, inplace=True)
-#     #print(df_data_material_bill.dtypes)
-#     #print(df_data_material_discount.dtypes)
-#     #更改dataframe列类型，避免联接之后字段出现大量NAN
-#
-#     df_data_material_bill['plant']=df_data_material_bill['plant'].astype('str')
-#     df_data_material_bill['date']=df_data_material_bill['date'].astype('datetime64')
-#     df_data_material_bill['quantity']=df_data_material_bill['quantity'].astype('int')
-#
-#
-#     # df_data_material_discount.columns=('plant', 'calday', 'discount_rate')
-#     df_data_material_discount.rename(columns = {'calday':'date'}, inplace=True)
-#
-#     df_data_material_discount['plant']=df_data_material_discount['plant'].astype('str')
-#     df_data_material_discount['date'] = df_data_material_discount['date'].astype('datetime64')
-#     df_data_material_discount['discount_rate'] = df_data_material_discount['discount_rate'].astype('float64')
-#
-#     # df_data_material_promotion.columns=('plant', 'promotion_type', 'discount', 'promotion_quantity', 'promotion_amount', 'retail_price', 'calday' )
-#     df_data_material_promotion.rename(columns = {'calday':'date'}, inplace=True)
-#     df_data_material_promotion['plant'] = df_data_material_promotion['plant'].astype('str')
-#     df_data_material_promotion['promotion_type'] = df_data_material_promotion['promotion_type'].astype('str')
-#     df_data_material_promotion['discount'] = df_data_material_promotion['discount'].astype('float64')
-#     df_data_material_promotion['promotion_quantity'] = df_data_material_promotion['promotion_quantity'].astype('int')
-#     df_data_material_promotion['promotion_amount'] = df_data_material_promotion['promotion_amount'].astype('float64')
-#     df_data_material_promotion['retail_price'] = df_data_material_promotion['retail_price'].astype('float64')
-#     df_data_material_promotion['date'] = df_data_material_promotion['date'].astype('datetime64')
-#
-#     # df_data_plant_join_numofpeople.columns=('plant', 'date', 'number_station', 'number_store', 'plant_asset', 'road_class', 'plant_stars', 'store_class',
-#     #                                         'building_area', 'business_hall', 'paking_area',  'store_area', 'plant_class_code', 'plant_location_class,
-#     #                                         plant_location_class, plant_keyanliang_desc, plant_type_desc')
-#     for i in df_data_plant_join_numofpeople_code.columns[1:]:
-#         df_data_plant_join_numofpeople_code[i] = df_data_plant_join_numofpeople_code[i].astype('str')
-#     #删除面积字段中多余字符串
-#     del_str_m2(df_data_plant_join_numofpeople_code)
-#     df_data_plant_join_numofpeople_code['date'] = df_data_plant_join_numofpeople_code['date'].astype('datetime64')
-#     df_data_plant_join_numofpeople_code['number_station'] = df_data_plant_join_numofpeople_code['number_station'].astype('int')
-#     df_data_plant_join_numofpeople_code['number_store'] = df_data_plant_join_numofpeople_code['number_store'].astype('int')
-#     df_data_plant_join_numofpeople_code['building_area'] = df_data_plant_join_numofpeople_code['building_area'].astype('float64')
-#     df_data_plant_join_numofpeople_code['business_hall'] = df_data_plant_join_numofpeople_code['business_hall'].astype('float64')
-#     df_data_plant_join_numofpeople_code['paking_area'] = df_data_plant_join_numofpeople_code['paking_area'].astype('float64')
-#     df_data_plant_join_numofpeople_code['store_area'] = df_data_plant_join_numofpeople_code['store_area'].astype('float64')
-#
-#     time_data_conversion_end = time.time()
-#     print("数据转换完成 耗时：%.3fs" % (time_data_conversion_end - time_data_conversion_start))
-#     #print(df_data_material_bill.dtypes)
-#     #print(df_data_material_discount.dtypes)
-#     #print(df_data_material_promotion)
-
-    # for i in df_data_material_discount_plant.columns:
-    #     print(df_data_material_discount_plant[i].unique())
 
 
     return df_data_material_discount_plant

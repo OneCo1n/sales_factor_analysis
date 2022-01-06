@@ -8,6 +8,12 @@ import lightgbm as lgb
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import GridSearchCV
+
+
+from gongxiangdanche.density import *
+from gongxiangdanche.outlier import *
+from gongxiangdanche.log_transformation import *
+
 sns.set(style='whitegrid',palette='tab10')
 matplotlib.rcParams['font.sans-serif'] = ['SimHei']
 matplotlib.rcParams['font.family'] = 'SimHei'
@@ -16,11 +22,11 @@ matplotlib.rcParams['axes.unicode_minus']=False
 #                                 数据读取、展示、缺失值处理
 
 # 数据展示
-train=pd.read_csv('E:/WorkSpace/PythonProjects/analysis/train.csv',encoding='utf-8')
+train=pd.read_csv('F:/论文/Shared-bicycle-usage-forecast-master/train.csv',encoding='utf-8')
 
 print(train.info())
 
-test=pd.read_csv('E:/WorkSpace/PythonProjects/analysis/test.csv',encoding='utf-8')
+test=pd.read_csv('F:/论文/Shared-bicycle-usage-forecast-master/test.csv',encoding='utf-8')
 print(test.info())
 
 
@@ -28,6 +34,7 @@ print(test.info())
 #                               数据处理
 #                               异常值处理
 # 描述性统计、异常值检测
+
 print(train.describe().T)
 
 #                               可以看出租赁额（count）数值差异大，再观察一下它们的密度分布：
@@ -41,18 +48,21 @@ print(train.describe().T)
 
 #                                   观察租赁额密度分布
 
-fig = plt.figure()
-ax = fig.add_subplot(1, 1, 1)
-fig.set_size_inches(6,5)
-ax = sns.distplot(train['count'])  # will be removed in a future version
-#ax = sns.histplot(train['count'])
-# sns.displot(train['count'])  # 这种写法 子图和画布会分离
-ax.set(xlabel='count',title='租用数量密度分布')
-plt.show()
+# 租赁密度图
+show_density(train, 'count')
+# fig = plt.figure()
+# ax = fig.add_subplot(1, 1, 1)
+# fig.set_size_inches(6,5)
+# ax = sns.distplot(train['count'])  # will be removed in a future version
+# #ax = sns.histplot(train['count'])
+# # sns.displot(train['count'])  # 这种写法 子图和画布会分离
+# ax.set(xlabel='count',title='租用数量密度分布')
+# plt.show()
 
 
 #                                                   离群值处理
 # 判断count是否为离群值（异常值），如果不是则不选取（删除）
+train_WithoutOutliers = delete_outlier(train, 'count')
 train_WithoutOutliers = train[np.abs(train['count']-train['count'].mean())<=(3*train['count'].std())]
 print(train_WithoutOutliers.shape)
 print(train_WithoutOutliers['count'].describe())
@@ -60,22 +70,30 @@ print(train_WithoutOutliers['count'].describe())
 
 fig=plt.figure(figsize=(12,5))
 ax1=fig.add_subplot(1,2,1)
-ax2=fig.add_subplot(1,2,2)
-
-sns.distplot(train_WithoutOutliers['count'],ax=ax1)
-sns.distplot(train['count'],ax=ax2)
-ax2.set(xlabel='count',title='去除长尾后count的分布')
 ax1.set(xlabel='registered',title='count的分布')
-plt.show()
-# 数据波动依然很大，而我们希望波动相对稳定，否则容易产生过拟合，所以希望对数据进行处理，使得数据相对稳定，此处选择对数变化，来使得数据稳定。
+sns.distplot(train['count'],ax=ax1)
 
-#                                      对数变换
-yLabels=train_WithoutOutliers['count']
-yLabels_log=np.log(yLabels)
-sns.distplot(yLabels_log)
-plt.show()
+ax2=fig.add_subplot(1,2,2)
+ax2.set(xlabel='count',title='去除长尾后count的分布')
+sns.distplot(train_WithoutOutliers['count'],ax=ax2)
 
-# 经过对数变换后数据分布更均匀，大小差异也缩小了，使用这样的标签对训练模型是有效果的。接下来对其余的数值型数据进行处理，由于其他数据同时包含在两个数据集中，为方便数据处理先将两个数据集合并。
+# 去除长尾（异常值）后的分布图
+plt.show()
+# # 数据波动依然很大，而我们希望波动相对稳定，否则容易产生过拟合，
+# 所以希望对数据进行处理，使得数据相对稳定，此处选择对数变化，来使得数据稳定。
+#
+# #                                      对数变换
+
+log_transform(train_WithoutOutliers, 'count')   # 这里的对数变换并未改变原数据
+
+# yLabels=train_WithoutOutliers['count']
+# yLabels_log=np.log(yLabels)
+# sns.distplot(yLabels_log)
+# plt.show()
+#
+
+# 经过对数变换后数据分布更均匀，大小差异也缩小了，使用这样的标签对训练模型是有效果的。
+# 接下来对其余的数值型数据进行处理，由于其他数据同时包含在两个数据集中，为方便数据处理先将两个数据集合并。
 
 
 # 为test中加入新列casual、registered、count 值都为 -1
@@ -107,11 +125,13 @@ axes[0,1].set(xlabel='atemp',title='体感温度分布情况')
 axes[1,0].set(xlabel='humidity',title='湿度分布情况')
 axes[1,1].set(xlabel='windspeed',title='风速分布情况')
 
+# 温度、体感温度、湿度、风速分布图
 plt.show()
 
 # 通过观察分布，发现风速为0的数据很多，但通过前边的观察统计可知整体数据是不包含缺失值的，
 # 所以可以推测到，数据本身应该是有缺失的，但是用0填充了，这些风速为0的数据会对预测产生干扰，
 # 可以使用随机森林根据相同的年份，月份，季节，温度，湿度等几个特征填充下风速的缺失值。
+
 
 #风速不为0的数据的风速的统计描述
 print(Bike_data[Bike_data['windspeed']!=0]['windspeed'].describe())
@@ -160,7 +180,7 @@ axes[1,1].set(xlabel='windseed',title='风速分布情况')
 plt.show()
 
 #                                           时间型数处理
-
+# 新增加了 date、hour、year、month、weekday
 Bike_data['date']=pd.DatetimeIndex(Bike_data['datetime']).date
 Bike_data['hour']=pd.DatetimeIndex(Bike_data['datetime']).hour
 Bike_data['year']=pd.DatetimeIndex(Bike_data['datetime']).year
@@ -168,7 +188,6 @@ Bike_data['month']=pd.DatetimeIndex(Bike_data['datetime']).month
 Bike_data['weekday']=pd.DatetimeIndex(Bike_data['datetime']).weekday
 
 print(Bike_data)
-
 
 
 
@@ -198,6 +217,7 @@ sns.pairplot(n_Bike_data ,
              x_vars=['holiday','workingday','weather','season',
                                 'weekday','hour','windspeed_rfr','humidity','temp','atemp'] ,
              y_vars=['casual','registered','count'] , plot_kws={'alpha': 0.1})
+
 plt.show()
 #大致可以看出：
 #
@@ -424,6 +444,9 @@ holiday_coun=day_df.groupby('year', as_index=True).agg({'holiday':'sum'})
 holiday_df = day_df.groupby('holiday',as_index=True).agg({'casual':'mean', 'registered':'mean'})
 holiday_df.plot.bar(stacked=True , title = '节假日与非节假日每天租车量的平均值')
 
+
+
+
 # 节假日会员或非会员使用量都比非节假日多，符合规律。
 
 #                                                                  预测性分析
@@ -431,74 +454,88 @@ holiday_df.plot.bar(stacked=True , title = '节假日与非节假日每天租车
 # 根据前面的观察，决定将时段（hour）、温度（temp）、湿度（humidity）、年份（year）、月份（month）、季节（season）、天气等级（weather）、
 # 风速（windspeed_rfr）、星期几（weekday）、是否工作日（workingday）、是否假日（holiday），11项作为特征值。
 
+
+## 创建数据集
 Bike=n_Bike_data[['year','month','hour','weekday','workingday','holiday','temp','humidity',
                  'season','weather','windspeed_rfr','count']]
 
+# y为目标值
 y = Bike['count']
 X = Bike.drop(['count'],axis=1).select_dtypes(exclude=['object'])
 
-# 训练集验证集分离
+print("xxxxxxxxxxxx")
+print(X)
+print("yyyyyyyyyyy")
+print(y)
 
+# 训练集验证集分离
 from sklearn.model_selection import train_test_split
+
 train_X, test_X, train_y, test_y = train_test_split(X.values, y.values, test_size=0.3)
 
+# 转换为lgb的数据类型
 lgb_train = lgb.Dataset(train_X, train_y)
 lgb_eval = lgb.Dataset(test_X, test_y, reference=lgb_train)
 
-# 模型参数选择
-#找到最优迭代次数
-params = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-
-    'learning_rate': 0.3,
-    'num_leaves': 50,
-    'max_depth': 17,
-
-    'subsample': 0.8,
-    'colsample_bytree': 0.8,
-    }
-cv_results = lgb.cv(
-    params, lgb_train, num_boost_round=1000, nfold=5, stratified=False, metrics='rmse',
-    early_stopping_rounds=50, verbose_eval=50,  seed=0)
-
-print('best n_estimators:', len(cv_results['rmse-mean']))
-print('best cv score:', cv_results['rmse-mean'][-1])
+# # 模型参数选择
+# #找到最优迭代次数
+# params = {
+#     'boosting_type': 'gbdt',
+#     'objective': 'regression',
+#
+#     'learning_rate': 0.3,
+#     'num_leaves': 50,
+#     'max_depth': 17,
+#
+#     'subsample': 0.8,
+#     'colsample_bytree': 0.8,
+#     }
+# cv_results = lgb.cv(
+#     params, lgb_train, num_boost_round=1000, nfold=5, stratified=False, metrics='rmse',
+#     early_stopping_rounds=50, verbose_eval=50,  seed=0)
+#
+# print('best n_estimators:', len(cv_results['rmse-mean']))
+# print('best cv score:', cv_results['rmse-mean'][-1])
 
 # 找到使模型效果达到最优的学习率、最大深度、最大叶子数、建树的特征选择比例
-model_lgb = lgb.LGBMRegressor(objective='regression',
-                              boosting_type='gbdt',
-                              n_estimators=81,
-                              metric='rmse')
+# model_lgb = lgb.LGBMRegressor(objective='regression',
+#                               boosting_type='gbdt',
+#                               n_estimators=81,
+#                               metric='rmse')
+#
+# params_test1 = {
+#     'max_depth': range(10, 30, 5),
+#     'num_leaves': range(50, 170, 30),
+#     'learning_rate': [0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0.01],
+#     'feature_fraction': [0.5, 0.6, 0.7, 0.8, 0.9],
+#     'bagging_fraction': [0.6, 0.7, 0.8, 0.9, 1.0]
+#
+# }
+#
+# gsearch1 = GridSearchCV(estimator=model_lgb, param_grid=params_test1, scoring='neg_mean_squared_error', cv=5, verbose=1,
+#                         n_jobs=4)
+# gsearch1.fit(train_X, train_y)
+#
+# #最优参数
+# print("最优参数最优参数最优参数最优参数")
+# print(gsearch1.best_params_)
+#
+# print(gsearch1.best_estimator_)
 
-params_test1 = {
-    'max_depth': range(10, 30, 5),
-    'num_leaves': range(50, 170, 30),
-    'learning_rate': [0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0.01],
-    'feature_fraction': [0.5, 0.6, 0.7, 0.8, 0.9],
-    'bagging_fraction': [0.6, 0.7, 0.8, 0.9, 1.0]
-
-}
-gsearch1 = GridSearchCV(estimator=model_lgb, param_grid=params_test1, scoring='neg_mean_squared_error', cv=5, verbose=1,
-                        n_jobs=4)
-gsearch1.fit(train_X, train_y)
-
-#最优参数
-gsearch1.best_params_
-
-gsearch1.best_estimator_
-
+# {'bagging_fraction': 0.6, 'feature_fraction': 0.7, 'learning_rate': 0.15, 'max_depth': 15, 'num_leaves': 110}
+# LGBMRegressor(bagging_fraction=0.6, feature_fraction=0.7, learning_rate=0.15,
+#               max_depth=15, metric='rmse', n_estimators=81, num_leaves=110,
+#               objective='regression')
 # 参数
 params = {
     'task': 'train',
     'boosting_type': 'gbdt',  # 设置提升类型
     'objective': 'regression',  # 目标函数
     'metric': {'mae'},  # 评估函数
-    'num_leaves':110
-    ,  # 叶子节点数
+    'num_leaves':110,  # 叶子节点数
     'max_depth':10,
-    'learning_rate': 0.1,  # 学习速率
-    'feature_fraction': 0.8,  # 建树的特征选择比例
+    'learning_rate': 0.15,  # 学习速率
+    'feature_fraction': 0.7,  # 建树的特征选择比例
     'bagging_fraction': 0.6,  # 建树的样本采样比例
     'bagging_freq': 10,  # k 意味着每 k 次迭代执行bagging
 }
