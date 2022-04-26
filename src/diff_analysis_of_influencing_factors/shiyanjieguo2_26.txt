@@ -1,0 +1,78 @@
+零食
+xgboost_mse, xgboost_rmse, xgboost_mae, xgboost_mape
+0.554123423508664  0.7443946691834002  0.3777168135320732  inf
+lightGBM_mse, lightGBM_rmse,  lightGBM_mae, lightGBM_mape
+0.40648683546434533  0.6375632011529095  0.5251507653434244  inf
+lasso_xgboost_mse, lasso_xgboost_rmse, lasso_xgboost_mae, lasso_xgboost_mape
+0.5553115312385337  0.7451922780320082  0.37825044973300814  inf
+lasso_lightGBM_mse, lasso_lightGBM_rmse, lasso_lightGBM_mae, lasso_lightGBM_mape
+0.42275455792480565  0.6501957843025481  0.5441490914664842  inf
+---------------
+xgboost_time , lightGBM_time, lasso_xgboost_time, lasso_lightGBM_time
+28.533313512802124  5.590190887451172  22.10371994972229  9.127482414245605
+
+香烟
+xgboost_mse, xgboost_rmse, xgboost_mae, xgboost_mape
+2.999023738152998  1.7317689621173484  1.1284238779999907  inf
+lightGBM_mse, lightGBM_rmse,  lightGBM_mae, lightGBM_mape
+1.6458480077683373  1.2829060790908808  1.0364273561021191  inf
+lasso_xgboost_mse, lasso_xgboost_rmse, lasso_xgboost_mae, lasso_xgboost_mape
+3.027875111380632  1.7400790531986277  1.1321876788963543  inf
+lasso_lightGBM_mse, lasso_lightGBM_rmse, lasso_lightGBM_mae, lasso_lightGBM_mape
+1.6919556667292428  1.3007519620316714  1.052842467166189  inf
+---------------
+xgboost_time , lightGBM_time, lasso_xgboost_time, lasso_lightGBM_time
+369.5186185836792  7.234802484512329  283.7729263305664  13.649969816207886
+
+糖果
+xgboost_mse, xgboost_rmse, xgboost_mae, xgboost_mape
+0.42300457848024053  0.6503880214765956  0.3072488101846985  inf
+lightGBM_mse, lightGBM_rmse,  lightGBM_mae, lightGBM_mape
+0.33412437802087464  0.5780349280284667  0.4573850108663662  inf
+lasso_xgboost_mse, lasso_xgboost_rmse, lasso_xgboost_mae, lasso_xgboost_mape
+0.4282839175101414  0.6544340436668475  0.312510979258315  inf
+lasso_lightGBM_mse, lasso_lightGBM_rmse, lasso_lightGBM_mae, lasso_lightGBM_mape
+0.3345565083084889  0.5784085997878048  0.46305351691668567  inf
+---------------
+xgboost_time , lightGBM_time, lasso_xgboost_time, lasso_lightGBM_time
+14.21365213394165  3.4872689247131348  14.008889436721802  6.028263568878174
+
+
+饼干/糕点
+xgboost_mse, xgboost_rmse, xgboost_mae, xgboost_mape
+0.40373951526290114  0.635405000974104  0.2990343178377786  inf
+lightGBM_mse, lightGBM_rmse,  lightGBM_mae, lightGBM_mape
+0.3118757241340899  0.5584583459257189  0.44515355174288374  inf
+lasso_xgboost_mse, lasso_xgboost_rmse, lasso_xgboost_mae, lasso_xgboost_mape
+0.4061314468306946  0.6372844316556734  0.3011172005462019  inf
+lasso_lightGBM_mse, lasso_lightGBM_rmse, lasso_lightGBM_mae, lasso_lightGBM_mape
+0.31398142452378  0.5603404541203321  0.4334872420172942  inf
+---------------
+xgboost_time , lightGBM_time, lasso_xgboost_time, lasso_lightGBM_time
+13.400140285491943  3.2344305515289307  13.202810049057007  5.642974376678467
+
+汽车用品
+xgboost_mse, xgboost_rmse, xgboost_mae, xgboost_mape
+4.209460368390118  2.0516969484770695  1.3795807341261457  inf
+lightGBM_mse, lightGBM_rmse,  lightGBM_mae, lightGBM_mape
+2.278786454146497  1.5095649883812545  1.2371935756047385  inf
+lasso_xgboost_mse, lasso_xgboost_rmse, lasso_xgboost_mae, lasso_xgboost_mape
+4.285666597729333  2.070185160252419  1.396701410929746  inf
+lasso_lightGBM_mse, lasso_lightGBM_rmse, lasso_lightGBM_mae, lasso_lightGBM_mape
+2.417166074596545  1.5547237936677192  1.2884964467073516  inf
+---------------
+xgboost_time , lightGBM_time, lasso_xgboost_time, lasso_lightGBM_time
+200.01948404312134  1.283616542816162  168.27992248535156  2.9250593185424805
+
+包装饮料
+xgboost_mse, xgboost_rmse, xgboost_mae, xgboost_mape
+3.257466577081858  1.8048453055821316  1.1115742147614387  inf
+lightGBM_mse, lightGBM_rmse,  lightGBM_mae, lightGBM_mape
+1.668034187883426  1.2915239788263422  1.0086358368292303  inf
+lasso_xgboost_mse, lasso_xgboost_rmse, lasso_xgboost_mae, lasso_xgboost_mape
+3.21201026566606  1.7922082093512628  1.1030195954122706  inf
+lasso_lightGBM_mse, lasso_lightGBM_rmse, lasso_lightGBM_mae, lasso_lightGBM_mape
+1.939095884217218  1.3925142312440537  1.1147140770274482  inf
+---------------
+xgboost_time , lightGBM_time, lasso_xgboost_time, lasso_lightGBM_time
+18479.990026474  7.718754291534424  1044.4491872787476  18.34371781349182

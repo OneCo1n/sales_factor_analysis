@@ -87,6 +87,58 @@ def get_bill_from_db_by_material_and_company(material, start_time, end_time, com
 
     return df_data_material_bill
 
+def get_bill_from_db_by_material_and_plant_class(material, start_time, end_time, plant_class):
+    db = getDBConnect()
+    cursor = db.cursor()
+
+    sql_select_bill_by_material = "select  plant, `date`, quantity from table_bill_groupby_plant_calday " \
+                                  "where material = '" + material + "' and `date` between '" + start_time + "' and '" + end_time + "' " \
+                                  "and plant in (SELECT plant from table_pos_zaplant_xy_orc_508 " \
+                                  "where plant_class_code = '" + plant_class + "')" \
+                                  "order by `date`"
+    time_sql_start = time.time()
+    print("正在获取商品销售信息......")
+    cursor.execute(sql_select_bill_by_material)
+    # get table
+    data_material_bill = cursor.fetchall()
+    # 获取连接对象的描述信息
+    columnDes = cursor.description
+    columnNames = [columnDes[i][0] for i in range(len(columnDes))]
+    df_data_material_bill = pd.DataFrame([list(i) for i in data_material_bill], columns=columnNames)
+    time_sql_end = time.time()
+
+    print("已获取商品销售信息 耗时：%.3fs" % (time_sql_end - time_sql_start))
+    # 关闭数据库连接
+    closeDBConnect(cursor, db)
+
+    return df_data_material_bill
+
+def get_bill_from_db_by_all_material_and_plant_class(start_time, end_time, plant_class):
+    db = getDBConnect()
+    cursor = db.cursor()
+
+    sql_select_bill_by_material = "select  material, plant, `date`, quantity from table_bill_groupby_plant_calday " \
+                                  " where `date` between '" + start_time + "' and '" + end_time + "' " \
+                                  " and plant in (SELECT plant from table_pos_zaplant_xy_orc_508 " \
+                                  " where plant_class_code = '" + plant_class + "')" \
+                                  " order by `date`"
+    time_sql_start = time.time()
+    print("正在获取商品销售信息......")
+    cursor.execute(sql_select_bill_by_material)
+    # get table
+    data_material_bill = cursor.fetchall()
+    # 获取连接对象的描述信息
+    columnDes = cursor.description
+    columnNames = [columnDes[i][0] for i in range(len(columnDes))]
+    df_data_material_bill = pd.DataFrame([list(i) for i in data_material_bill], columns=columnNames)
+    time_sql_end = time.time()
+
+    print("已获取商品销售信息 耗时：%.3fs" % (time_sql_end - time_sql_start))
+    # 关闭数据库连接
+    closeDBConnect(cursor, db)
+
+    return df_data_material_bill
+
 def get_bill_from_db_by_category_and_company(category, start_time, end_time, company):
 
     db = getDBConnect()

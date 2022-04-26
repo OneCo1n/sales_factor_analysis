@@ -23,10 +23,10 @@ def get_plant_from_db(start_time, end_time):
                                         "b.building_area, b.business_hall," \
                                         "b.paking_area," \
                                         "b.store_area,b.plant_class_code," \
-                                        "b.plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc " \
+                                        "b.plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc, b.store_class_desc,b.plant_city_desc " \
                                         "from table_number_station_store  a left join table_pos_zaplant_xy_orc_508  b " \
                                         "on a.plant = b.bic_zaplant where a.date BETWEEN '" + start_time + "' and '" + end_time  + "' order by a.date"
-
+    #, b.plant_city_desc
     time_sql_start = time.time()
     print("正在获取油站信息......")
     cursor.execute(sql_select_plant_join_numofpeople_code)
@@ -87,6 +87,38 @@ def get_plant_desc_by_company_from_db(start_time, end_time, company):
                                              "b.road_location_desc as plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc " \
                                              " from table_number_station_store  a left join table_pos_zaplant_xy_orc_508  b " \
                                              " on a.plant = b.bic_zaplant where a.date BETWEEN '" + start_time + "' and '" + end_time + "'and b.plant_city_desc = '" + company + "' order by a.date "
+
+    time_sql_start = time.time()
+    print("正在获取油站信息......")
+    cursor.execute(sql_select_plant_join_numofpeople_code)
+    # 使用 fetchall() 方法获取所有数据.以元组形式返回
+    data_plant_join_numofpeople_code = cursor.fetchall()
+    columnDes = cursor.description
+    columnNames = [columnDes[i][0] for i in range(len(columnDes))]
+    df_data_plant_join_numofpeople_code = pd.DataFrame([list(i) for i in data_plant_join_numofpeople_code],
+                                                       columns=columnNames)
+    time_sql_end = time.time()
+    print("已获取油站信息 耗时：%.3fs" % (time_sql_end - time_sql_start))
+
+    # cursor.close()
+    closeDBConnect(cursor, db)
+
+    return df_data_plant_join_numofpeople_code
+
+
+def get_plant_desc_by_plant_class_from_db(start_time, end_time, plant_class):
+    db = getDBConnect()
+    cursor = db.cursor()
+
+    sql_select_plant_join_numofpeople_code = "SELECT distinct a.plant , a.date, a.number_station, a.number_store, " \
+                                             "b.plant_asset_desc as plant_asset, b.road_class_desc as road_class," \
+                                             "b.plant_stars_desc as plant_stars,b.store_class_desc as store_class," \
+                                             "b.building_area, b.business_hall," \
+                                             "b.paking_area," \
+                                             "b.store_area,b.plant_class_desc as plant_class_code," \
+                                             "b.road_location_desc as plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc " \
+                                             " from table_number_station_store  a left join table_pos_zaplant_xy_orc_508  b " \
+                                             " on a.plant = b.bic_zaplant where a.date BETWEEN '" + start_time + "' and '" + end_time + "'and b.plant_class_code = '" + plant_class + "' order by a.date "
 
     time_sql_start = time.time()
     print("正在获取油站信息......")
@@ -182,9 +214,41 @@ def query_plant_from_db_by_company(start_time, end_time,company):
                                              "b.building_area, b.business_hall," \
                                              "b.paking_area," \
                                              "b.store_area,b.plant_class_code," \
-                                             "b.plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc " \
+                                             "b.plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc, b.store_class_desc " \
                                              "from table_number_station_store  a left join table_pos_zaplant_xy_orc_508  b " \
                                              "on a.plant = b.bic_zaplant where a.date BETWEEN '" + start_time + "' and '" + end_time + "'and b.plant_city_desc = '" + company + "'  order by a.date "
+
+    time_sql_start = time.time()
+    print("正在获取油站信息......")
+    cursor.execute(sql_select_plant_join_numofpeople_code)
+    # 使用 fetchall() 方法获取所有数据.以元组形式返回
+    data_plant_join_numofpeople_code = cursor.fetchall()
+    columnDes = cursor.description
+    columnNames = [columnDes[i][0] for i in range(len(columnDes))]
+    df_data_plant_join_numofpeople_code = pd.DataFrame([list(i) for i in data_plant_join_numofpeople_code],
+                                                       columns=columnNames)
+    time_sql_end = time.time()
+    print("已获取油站信息 耗时：%.3fs" % (time_sql_end - time_sql_start))
+
+    # cursor.close()
+    closeDBConnect(cursor, db)
+
+    return df_data_plant_join_numofpeople_code
+
+
+def query_plant_from_db_by_plant_class(start_time, end_time, plant_class):
+    db = getDBConnect()
+    cursor = db.cursor()
+
+    sql_select_plant_join_numofpeople_code = "SELECT distinct a.plant , a.date, a.number_station, a.number_store, " \
+                                             "b.plant_asset, b.road_class," \
+                                             "b.plant_stars,b.store_class," \
+                                             "b.building_area, b.business_hall," \
+                                             "b.paking_area," \
+                                             "b.store_area,b.plant_class_code," \
+                                             "b.plant_location_class, b.plant_keyanliang_desc, b.plant_type_desc " \
+                                             "from table_number_station_store  a left join table_pos_zaplant_xy_orc_508  b " \
+                                             "on a.plant = b.bic_zaplant where a.date BETWEEN '" + start_time + "' and '" + end_time + "'and b.plant_class_code = '" + plant_class + "'  order by a.date "
 
     time_sql_start = time.time()
     print("正在获取油站信息......")

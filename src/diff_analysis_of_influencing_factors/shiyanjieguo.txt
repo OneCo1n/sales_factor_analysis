@@ -1,0 +1,24 @@
+类别：零食
+RMSE	0.62
+MAE 	0.40
+MAPE	0.12
+类别：香烟
+RMSE	1.17
+MAE 	0.89
+MAPE	0.23
+类别：包装饮料
+RMSE	1.32
+MAE 	1.06
+MAPE	0.21
+类别：糖果
+RMSE	0.53
+MAE 	0.38
+MAPE	0.14
+类别：糕点
+RMSE	0.56
+MAE 	0.28
+MAPE	0.14
+类别：汽车用品
+RMSE	1.46
+MAE 	1.27
+MAPE	0.44

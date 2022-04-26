@@ -13,8 +13,20 @@ def total_data_merge(bill, discount, plant, poi, promotion):
 
     return df_total
 
+def total_by_all_material_and_plant_class_data_merge(bill, discount, plant, poi, promotion):
+    df_bill_join_promotion = pd.merge(bill, promotion, on=['material', 'plant', 'date'], how='left')
+    df_plant_join_poi = pd.merge(plant, poi, on=['plant'])
+    df_total = pd.merge(df_bill_join_promotion, df_plant_join_poi, on=['plant', 'date'], how='left')
+
+    # print("------------------df_bill_join_promotion----------------------")
+    # print(df_bill_join_promotion)
+    # print("------------------df_plant_join_poi----------------------")
+    # print(df_plant_join_poi)
+
+    return df_total
+
 def total_category_data_merge(bill, discount, plant, poi, promotion):
-    df_bill_join_promotion = pd.merge(bill, promotion, on=['material','plant', 'date'], how='left')
+    df_bill_join_promotion = pd.merge(bill, promotion, on=['material', 'plant', 'date'], how='left')
     df_plant_join_poi = pd.merge(plant, poi, on=['plant'])
     df_total = pd.merge(df_bill_join_promotion, df_plant_join_poi, on=['plant', 'date'], how='left')
 

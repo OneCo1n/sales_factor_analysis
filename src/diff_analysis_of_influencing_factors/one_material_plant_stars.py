@@ -1,6 +1,6 @@
 from diff_analysis_of_influencing_factors.data_set.data_division import model_data_division
-from diff_analysis_of_influencing_factors.train_model.lasso_lightGBM.lasso_lightGBM import \
-    do_analysis_use_lasso_lightGBM
+from diff_analysis_of_influencing_factors.train_model.lasso_lightGBM.esf_gbdt import \
+    do_analysis_use_esf_gbdt
 from diff_analysis_of_influencing_factors.train_model.lightGBM.lightGBM import use_lightGBM, do_analysis_use_lightGBM
 from flaskTest.views.data_views.total_views import get_total_by_material, get_total_desc_by_material, \
     get_total_by_material_and_company, get_total_desc_by_material_and_company, get_total_by_material_and_keyanliang, \
@@ -42,8 +42,8 @@ def do_analysis_one_material_plant_group_by_stars(material, start_time, end_time
     # 对销量进行分析
     target_name = 'quantity'
 
-    mse, rmse, r2, importance_dict = do_analysis_use_lightGBM(data, target_name)
-    mse, rmse, r2, importance_dict = do_analysis_use_lasso_lightGBM(data, target_name)
+    # mse, rmse, r2, importance_dict = do_analysis_use_lightGBM(data, target_name)
+    mse, rmse, r2, importance_dict = do_analysis_use_esf_gbdt(data, target_name)
 
     print(importance_dict)
     plot_importance(importance_dict)

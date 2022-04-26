@@ -6,7 +6,7 @@ def total_missing_value_process(total):
 
     ##删除number_station、number_store为空的行
     total.replace('None', np.nan, inplace=True)
-    col_set = ['number_station', 'number_store','type07']
+    col_set = ['number_station', 'number_store', 'type07']
     total.dropna(axis=0, subset=col_set, inplace=True)
     # 缺失值处理
     missing_value_fill_str_NP(total, 'promotion_type')

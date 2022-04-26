@@ -1,8 +1,10 @@
 from data_preprocess.missing_value_processing import missing_value_check, nan_value_check
+from flaskTest.preprocess.bill.bill_preprocess import bill_log
 from flaskTest.preprocess.plant.plant_area_str import plant_area_m2_delete
 from flaskTest.preprocess.plant.plant_col_name import *
 from flaskTest.preprocess.plant.plant_dtypes import *
 from flaskTest.preprocess.plant.plant_feature_select import plant_feature_select
+from gongxiangdanche.density import show_density
 from gongxiangdanche.outlier import *
 
 
@@ -20,6 +22,9 @@ def preprocess_plant(plant):
     # 异常值处理
 
     # 缺失值
+    show_density(plant, 'number_station')
+    # 对数转换
+    log_col = ["number_station"]
+    plant = bill_log(plant, log_col)
 
-    # 异常值
     return plant

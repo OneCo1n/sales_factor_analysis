@@ -1,16 +1,18 @@
 from flaskTest.preprocess.total.total_preprocess import preprocess_total, preprocess_plant_and_poi, \
     preprocess_bill_and_plant_desc, preprocess_bill_and_promotion, preprocess_total_desc, preprocess_total_category, \
-    preprocess_plant_and_poi_desc
+    preprocess_plant_and_poi_desc, preprocess_total_by_all_material_and_plant_class
 from flaskTest.views.data_views.bill_views import get_bill_by_material, get_bill_by_material_and_company, \
     get_bill_by_category, get_bill_by_material_and_keyanliang, get_bill_by_material_and_stars, \
-    get_bill_by_category_and_company, get_bill_by_category_and_keyanliang, get_bill_by_category_and_stars
+    get_bill_by_category_and_company, get_bill_by_category_and_keyanliang, get_bill_by_category_and_stars, \
+    get_bill_by_material_and_plant_class, get_bill_by_all_material_and_plant_class
 from flaskTest.views.data_views.discount_views import get_discount_by_material, get_discount_by_category
 from flaskTest.views.data_views.plant_views import get_plant, get_plantInfoDesc, get_plant_by_company, \
     get_plantInfoDesc_by_company, get_plant_desc, get_plant_desc_by_company, get_plant_by_keyanliang, \
-    get_plant_desc_by_keyanliang, get_plant_by_stars, get_plant_desc_by_stars
+    get_plant_desc_by_keyanliang, get_plant_by_stars, get_plant_desc_by_stars, get_plant_by_plant_class, \
+    get_plant_desc_by_plant_class
 from flaskTest.views.data_views.poi_views import get_poi
 from flaskTest.views.data_views.promotion_views import get_promotion_by_material, get_promotion_desc_by_material, \
-    get_promotion_by_category, get_promotion_desc_by_category
+    get_promotion_by_category, get_promotion_desc_by_category, get_promotion_by_all_material_and_plant_class
 import seaborn as sns
 import matplotlib
 
@@ -27,7 +29,8 @@ def get_total_by_material(material, start_time, end_time):
 
     # 获取处理好的各个表数据
     bill = get_bill_by_material(material, start_time, end_time)
-    discount = get_discount_by_material(material , start_time, end_time)
+    # discount = get_discount_by_material(material , start_time, end_time)
+    discount = ""
     plant = get_plant(start_time, end_time)
     poi = get_poi()
     promotion = get_promotion_by_material(material, start_time, end_time)
@@ -80,7 +83,8 @@ def get_total_desc_by_material(material , start_time, end_time):
 
     # 获取处理好的各个表数据
     bill = get_bill_by_material(material, start_time, end_time)
-    discount = get_discount_by_material(material, start_time, end_time)
+    # discount = get_discount_by_material(material, start_time, end_time)
+    discount = ""
     plant = get_plant_desc(start_time, end_time)
     poi = get_poi()
     promotion = get_promotion_desc_by_material(material, start_time, end_time)
@@ -113,8 +117,25 @@ def get_total_desc_by_category(category, start_time, end_time):
 def get_total_desc_by_material_and_company(material, start_time, end_time, company):
     # 获取处理好的各个表数据
     bill = get_bill_by_material_and_company(material, start_time, end_time, company)
-    discount = get_discount_by_material(material, start_time, end_time)
+    discount = ""
     plant = get_plant_desc_by_company(start_time, end_time, company)
+    poi = get_poi()
+    promotion = get_promotion_desc_by_material(material, start_time, end_time)
+
+    # 对多个表数据进行合并，对合并之后的数据进行处理
+    total = preprocess_total_desc(bill, discount, plant, poi, promotion)
+    # print(total.info)
+    # print(total.describe().T)
+    # print(total.dtypes)
+
+    return total
+
+def get_total_desc_by_material_and_plant_class(material, start_time, end_time, plant_class):
+    # 获取处理好的各个表数据
+    bill = get_bill_by_material_and_plant_class(material, start_time, end_time, plant_class)
+    # discount = get_discount_by_material(material, start_time, end_time)
+    discount = ''
+    plant = get_plant_desc_by_plant_class(start_time, end_time, plant_class)
     poi = get_poi()
     promotion = get_promotion_desc_by_material(material, start_time, end_time)
 
@@ -215,13 +236,48 @@ def get_total_by_material_and_company(material,start_time, end_time, company):
 
     # 获取处理好的各个表数据
     bill = get_bill_by_material_and_company(material, start_time, end_time, company)
-    discount = get_discount_by_material(material, start_time, end_time)
+    discount = ""
     plant = get_plant_by_company(start_time, end_time, company)
     poi = get_poi()
     promotion = get_promotion_by_material(material, start_time, end_time)
 
     # 对多个表数据进行合并，对合并之后的数据进行处理
     total = preprocess_total(bill, discount, plant, poi, promotion)
+    # print(total.info)
+    # print(total.describe().T)
+    # print(total.dtypes)
+
+    return total
+
+def get_total_by_material_and_plant_class(material, start_time, end_time, plant_class):
+    # 获取处理好的各个表数据
+    bill = get_bill_by_material_and_plant_class(material, start_time, end_time, plant_class)
+
+    # discount = get_discount_by_material(material, start_time, end_time)
+    discount = ''
+    plant = get_plant_by_plant_class(start_time, end_time, plant_class)
+    poi = get_poi()
+    promotion = get_promotion_by_material(material, start_time, end_time)
+
+    # 对多个表数据进行合并，对合并之后的数据进行处理
+    total = preprocess_total(bill, discount, plant, poi, promotion)
+    # print(total.info)
+    # print(total.describe().T)
+    # print(total.dtypes)
+
+    return total
+
+def get_total_by_all_material_and_plant_class(start_time, end_time, plant_class):
+    # 获取处理好的各个表数据
+    bill = get_bill_by_all_material_and_plant_class(start_time, end_time, plant_class)
+    # discount = get_discount_by_material(material, start_time, end_time)
+    discount = ''
+    plant = get_plant_by_plant_class(start_time, end_time, plant_class)
+    poi = get_poi()
+    promotion = get_promotion_by_all_material_and_plant_class(start_time, end_time, plant_class)
+
+    # 对多个表数据进行合并，对合并之后的数据进行处理
+    total = preprocess_total_by_all_material_and_plant_class(bill, discount, plant, poi, promotion)
     # print(total.info)
     # print(total.describe().T)
     # print(total.dtypes)
@@ -374,9 +430,12 @@ def get_total_people(start_time, end_time):
 
     # 将plant与poi合并，进行处理
     plant_and_poi = preprocess_plant_and_poi(plant, poi)
-    # 删除无用特征
+    # 删除无用特征'plant_class_code',
     plant_and_poi = plant_and_poi.drop(labels=None, axis=1, index=None,
-                       columns=['number_store'],
+                       columns=['building_area', 'business_hall','store_area','store_class',
+                                'store_class_desc','plant_stars','plant_keyanliang_desc','number_store',
+                                'plant_city_desc'
+                                ],
                        inplace=False)
 
     return plant_and_poi
@@ -390,8 +449,9 @@ def get_total_people_by_company(start_time, end_time, company):
     plant_and_poi = preprocess_plant_and_poi(plant, poi)
     # 删除无用特征
     plant_and_poi = plant_and_poi.drop(labels=None, axis=1, index=None,
-                                       columns=['number_store'],
+                                       columns=['number_store',],
                                        inplace=False)
+
 
     return plant_and_poi
 

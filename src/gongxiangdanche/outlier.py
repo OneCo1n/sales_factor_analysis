@@ -4,7 +4,7 @@ import numpy as np
 def delete_outlier(df, col):
 
     # 判断count是否为离群值（异常值），如果不是则不选取（删除）
-    df_WithoutOutliers = df[np.abs(df[col] - df[col].mean()) <= (3 * df[col].std())]
+    df_WithoutOutliers = df[np.abs(df[col]) >= df[col].mean() + (3 * df[col].std())]
 
     return df_WithoutOutliers
 
@@ -24,4 +24,6 @@ def replace_outlier(df, cols):
         df[col] = df[col].map(lambda x: replace_val(x, mean, abs(std_dev)))
 
     return df
+
+
 

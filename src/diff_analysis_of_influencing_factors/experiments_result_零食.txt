@@ -1,0 +1,42 @@
+xgboost number of times: 0
+xgboost_mse:  0.0890342871619999
+xgboost_rmse: 0.2983861376840417
+xgboost_mae:  0.08922387703355887
+xgboost_mape: 0.046410762045869726
+xgboost_time: 27.485852241516113 s
+------------------------------------------------------------
+xgboost average of 1 results: 
+xgboost_mse:  0.0890342871619999
+xgboost_rmse: 0.2983861376840417
+xgboost_mae:  0.08922387703355887
+xgboost_mape: 0.046410762045869726
+xgboost_time: 27.485852241516113 s
+------------------------------------------------------------
+xgboost number of times: 0
+xgboost_mse:  0.09237738983982599
+xgboost_rmse: 0.30393648981296406
+xgboost_mae:  0.09114385236328074
+xgboost_mape: 0.047018492783878436
+xgboost_time: 3.2979743480682373 s
+------------------------------------------------------------
+xgboost average of 1 results: 
+xgboost_mse:  0.09237738983982599
+xgboost_rmse: 0.30393648981296406
+xgboost_mae:  0.09114385236328074
+xgboost_mape: 0.047018492783878436
+xgboost_time: 3.2979743480682373 s
+------------------------------------------------------------
+xgboost number of times: 0
+xgboost_mse:  0.08784663635967371
+xgboost_rmse: 0.29638933239857623
+xgboost_mae:  0.08909598280963138
+xgboost_mape: 0.04715528495264648
+xgboost_time: 289.91592168807983 s
+------------------------------------------------------------
+xgboost average of 1 results: 
+xgboost_mse:  0.08784663635967371
+xgboost_rmse: 0.29638933239857623
+xgboost_mae:  0.08909598280963138
+xgboost_mape: 0.04715528495264648
+xgboost_time: 289.91592168807983 s
+------------------------------------------------------------

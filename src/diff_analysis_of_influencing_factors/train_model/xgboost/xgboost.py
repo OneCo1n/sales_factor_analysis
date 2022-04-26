@@ -10,11 +10,24 @@ import xgboost as xgb
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import explained_variance_score
+import numpy as np
+from sklearn import metrics
+
+from diff_analysis_of_influencing_factors.data_set.data_division import model_data_division
+
+
+def do_analysis_use_xgboost(data, target_name):
+
+    x_train, x_test, y_train, y_test = model_data_division(data, target_name, 0.2)
+    # 用于模型训练，得出特征重要度
+    mse, rmse, r2, mae, mape, importance_dict = use_xgboost(x_train, x_test, y_train, y_test, target_name)
+    return mse, rmse, r2, mae, mape, importance_dict
 
 
 def use_xgboost(x_train, x_test, y_train, y_test, target_name):
     # 训练模型
-    model = xgb.XGBClassifier(max_depth=5, learning_rate=0.1, n_estimators=160, silent=True, objective='multi:softmax')
+    # silent=True,
+    model = xgb.XGBClassifier(max_depth=5, learning_rate=0.1, n_estimators=1000,  objective='reg:squarederror')
     model.fit(x_train, y_train)
 
     # 对测试集进行预测
@@ -25,10 +38,18 @@ def use_xgboost(x_train, x_test, y_train, y_test, target_name):
     print('accuracy:%2.f%%' % (accuracy * 100))
 
     # 评估模型
-    print('[info : lightGBM] The mse of prediction is:', mean_squared_error(y_test, y_pred))
-    print('[info : lightGBM] The rmse of prediction is:',
-          mean_squared_error(y_test, y_pred) ** 0.5)  # 计算真实值和预测值之间的均方根误差
-    print('[info : lightGBM] the r2 of prediction is:', r2_score(y_test, y_pred))
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = mean_squared_error(y_test, y_pred) ** 0.5
+    r2 = r2_score(y_test, y_pred)
+    mae = metrics.mean_absolute_error(y_test, y_pred)
+    mape = calculate_mape(y_test, y_pred)
+    print('[info : XGBoost] The mse of prediction is:', mse)
+    print('[info : XGBoost] The rmse of prediction is:', rmse)  # 计算真实值和预测值之间的均方根误差
+    print('[info : XGBoost] the r2 of prediction is:', r2)
+    print('[info : XGBoost] the mae of prediction is:', mae)
+    print('[info : XGBoost] the mape of prediction is:', mape)
+
+
 
     importance = model.feature_importances_
     feature_name = model._Booster.feature_names
@@ -49,6 +70,8 @@ def use_xgboost(x_train, x_test, y_train, y_test, target_name):
     # gbm = GridSearchCV(estimator, param_grid)
     # gbm.fit(X_train, y_train)
     # print('[info : lightGBM] Best parameters found by grid search are:', gbm.best_params_)
-    return importance_dict
+    return mse, rmse, r2, mae, mape, importance_dict
 
-
+# MAPE需要自己实现
+def calculate_mape(y_true, y_pred):
+    return np.mean(np.abs((y_pred - y_true) / y_true))

@@ -3,11 +3,17 @@ import pandas as pd
 
 
 def getDBConnect():
-    host = "10.112.181.70"
+    # host = "10.112.181.70"
+    # port = 3306
+    # user = "root"
+    # passwd = "bupt"
+    # db = "cnpc_local_k40"
+
+    host = "localhost"
     port = 3306
     user = "root"
-    passwd = "bupt"
-    db = "cnpc_local_k40"
+    passwd = "123456a1"
+    db = "cnpc_local"
     charset = "utf8"
     db = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, charset=charset)
     return db

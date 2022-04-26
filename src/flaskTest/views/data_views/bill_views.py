@@ -39,6 +39,29 @@ def get_bill_by_material_and_company(material, start_time, end_time, company):
 
     return bill
 
+
+def get_bill_by_material_and_plant_class(material, start_time, end_time, plant_class):
+    bill = get_bill_from_db_by_material_and_plant_class(material, start_time, end_time, plant_class)
+    bill = preprocess_bill(bill)
+
+    # print(bill.info)
+    # print(bill.describe().T)
+    # print(bill.dtypes)
+
+    return bill
+
+def get_bill_by_all_material_and_plant_class(start_time, end_time, plant_class):
+
+    bill = get_bill_from_db_by_all_material_and_plant_class(start_time, end_time, plant_class)
+    bill = preprocess_bill(bill)
+
+    # print(bill.info)
+    # print(bill.describe().T)
+    # print(bill.dtypes)
+
+    return bill
+
+
 def get_bill_by_category_and_company(category, start_time, end_time, company):
     bill = get_bill_from_db_by_category_and_company(category, start_time, end_time, company)
     bill = preprocess_bill(bill)

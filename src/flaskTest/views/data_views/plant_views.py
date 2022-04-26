@@ -41,6 +41,17 @@ def get_plant_desc_by_company(start_time, end_time, company):
 
     return plant
 
+def get_plant_desc_by_plant_class(start_time, end_time, plant_class):
+    # 数据库抽取数据
+    plant = get_plant_desc_by_plant_class_from_db(start_time, end_time, plant_class)
+    plant = preprocess_plant(plant)
+
+    # print(plant.info)
+    # print(plant.describe().T)
+    # print(plant.dtypes)
+
+    return plant
+
 def get_plant_desc_by_keyanliang(start_time, end_time, keyanliang):
     # 数据库抽取数据
 
@@ -78,6 +89,20 @@ def get_plant_by_company(start_time, end_time, company):
     print(plant.dtypes)
 
     return plant
+
+def get_plant_by_plant_class(start_time, end_time, plant_class):
+
+    # 数据库抽取数据
+    plant = query_plant_from_db_by_plant_class(start_time, end_time, plant_class)
+
+    plant = preprocess_plant(plant)
+
+    print(plant.info)
+    print(plant.describe().T)
+    print(plant.dtypes)
+
+    return plant
+
 
 def get_plant_by_keyanliang(start_time, end_time, keyanliang):
     # 数据库抽取数据
